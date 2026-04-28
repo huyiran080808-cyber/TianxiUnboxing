@@ -1,0 +1,1321 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>天禧 Claw 原型 Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css?v=69" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="window-frame">
+        <header class="tab-bar">
+          <div class="tab-left">
+            <div class="nav-actions">
+              <div class="icon-button icon-back" id="nav-back" aria-hidden="true">
+                <img src="./figma-assets/4ac246a7-0e1b-4ee4-8113-e350b06fe757.svg" alt="" style="transform: rotate(180deg);" />
+              </div>
+              <div class="icon-button icon-next" id="nav-forward" aria-hidden="true">
+                <img src="./figma-assets/8ca79659-a02a-4517-a2ae-71a71b593ab6.svg" alt="" />
+              </div>
+            </div>
+            <div class="tabs">
+              <div class="tab-chip" id="tab-home">
+                <span class="tab-home-icon" aria-hidden="true">
+                  <img class="tab-home-main" src="./figma-assets/990e00f2-61ce-4f03-9f2d-d0581089fe7e.svg" alt="" />
+                  <img class="tab-home-mid" src="./figma-assets/045ca61f-9011-415b-8958-8389de54ae54.svg" alt="" />
+                  <img class="tab-home-base" src="./figma-assets/0bb4f786-f75f-4412-b637-b1a42da5229c.svg" alt="" />
+                </span>
+                <span>主页</span>
+              </div>
+              <div class="tab-chip is-active" id="tab-claw">
+                <span class="tab-chip-icon tab-chip-icon-claw" aria-hidden="true">
+                  <img src="./figma-assets/31648c85-08b3-4367-ae29-587fd6237d54.svg" alt="" style="filter: brightness(0) invert(1);" />
+                </span>
+                <span>天禧 Claw</span>
+              </div>
+            </div>
+          </div>
+          <div class="tab-right">
+            <div class="account-pill" aria-hidden="true">
+              <img class="account-user" src="./figma-assets/edfb278c-764c-4f7b-ab98-3ed2301c6271.svg" alt="" />
+              <span class="account-caret-wrap">
+                <img class="account-caret-image" src="./figma-assets/00798c63-3f5c-48d7-908f-c9af66a1bd31.svg" alt="" />
+              </span>
+            </div>
+            <div class="icon-button pin-button" aria-hidden="true">
+              <img src="./figma-assets/a2332c31-f5c5-4651-a4c7-7cb9e21b0c14.svg" alt="" />
+            </div>
+            <div class="icon-button mini-button" aria-hidden="true">
+              <img src="./figma-assets/a1cff4db-3dea-4eca-b961-a8d2ce35aea8.svg" alt="" />
+            </div>
+            <div class="icon-button square-button" aria-hidden="true">
+              <img src="./figma-assets/6c886061-3810-4cc1-86ee-c3b3a1c0c426.svg" alt="" />
+            </div>
+            <div class="icon-button close-button" aria-hidden="true">
+              <img src="./figma-assets/d434c192-59c8-4ac8-921a-c99f9961f781.svg" alt="" />
+            </div>
+          </div>
+        </header>
+
+        <div class="window-body">
+          <div class="top-tip">
+            <div class="tip-badge">
+              <img
+                class="tip-icon"
+                src="./figma-assets/8441306d-5267-4a68-b918-d20ff9ad4512.svg"
+                alt=""
+              />
+              <span>玩转手册</span>
+            </div>
+            <div class="tip-icon-btn" id="btn-history" title="历史对话">
+              <div class="tip-icon-inner">
+                <img src="./figma-assets/943e5836-dc3f-4649-b350-d6d53802ca17.svg" alt="" />
+              </div>
+            </div>
+            <div class="tip-icon-btn" id="btn-agent-detail" title="虾详情">
+              <div class="tip-icon-inner tip-icon-inner-lg">
+                <img src="./figma-assets/31a5484d-800b-45f9-9edd-88087b498f6c.svg" alt="" />
+              </div>
+            </div>
+          </div>
+          <aside class="sidebar" id="sidebar">
+            <!-- Expanded state -->
+            <div class="sidebar-inner" id="sidebar-expanded">
+              <div class="sidebar-header">
+                <img
+                  class="sidebar-logo"
+                  src="./figma-assets/7d7b6f73-c1e6-447e-8c39-2870c8a89a9c.svg"
+                  alt="天禧 Claw"
+                />
+                <img
+                  class="mini-square-image sidebar-toggle"
+                  id="sidebar-collapse-btn"
+                  src="./figma-assets/cb300e07-9636-4517-ba6d-23e38d9356c9.svg"
+                  alt=""
+                />
+              </div>
+
+              <div class="sidebar-content">
+                <section class="agent-block">
+                  <div class="agent-card is-active">
+                    <div class="agent-avatar-wrap">
+                      <div class="agent-avatar-clip">
+                        <img src="./custom-assets/agent-xiaguanjia.png" alt="" />
+                      </div>
+                    </div>
+                    <span class="agent-copy">
+                      <strong>虾管家</strong>
+                      <small>开箱即用，越用越新，7x24不断线，全设备可用的超级助理</small>
+                    </span>
+                  </div>
+
+                  <nav class="history-list" data-agent="xiaguangjia">
+                    <div class="history-item" data-hist-idx="0">
+                      <img class="history-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                      <span>帮我解读这个文件</span>
+                    </div>
+                    <div class="history-item" data-hist-idx="1">
+                      <img class="history-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                      <span>什么是第一性原理？</span>
+                    </div>
+                    <div class="history-item" data-hist-idx="2">
+                      <img class="history-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                      <span>写一段生日祝福文案</span>
+                    </div>
+                    <div class="history-item history-hidden" data-hist-idx="3">
+                      <img class="history-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                      <span>帮我做一份周报</span>
+                    </div>
+                    <div class="history-item history-hidden" data-hist-idx="4">
+                      <img class="history-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                      <span>规划一个成都周末两日游</span>
+                    </div>
+                    <div class="history-item history-hidden" data-hist-idx="5">
+                      <img class="history-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                      <span>把这份会议纪要整理成邮件</span>
+                    </div>
+                    <div class="history-item history-hidden" data-hist-idx="6">
+                      <img class="history-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                      <span>帮我写一篇产品介绍文案</span>
+                    </div>
+                    <div class="history-item history-more" data-agent-more="xiaguangjia">
+                      <img class="history-icon" src="./figma-assets/214502a9-fe9d-4037-98f1-24cbe63dd3ac.svg" alt="" />
+                      <span>查看更多</span>
+                    </div>
+                  </nav>
+                </section>
+
+                <div class="sidebar-divider"></div>
+
+                <section class="agent-block secondary-block">
+                  <div class="secondary-agent" data-agent="xiaoxiaomi">
+                    <img
+                      class="agent-avatar"
+                      src="https://www.figma.com/api/mcp/asset/99b853ee-2334-4d97-9d2d-34b5cb63d180"
+                      alt=""
+                    />
+                    <span class="agent-copy">
+                      <strong>虾小秘</strong>
+                      <small>邮件飞书一把抓，打工人的专属秘书</small>
+                    </span>
+                  </div>
+
+                  <nav class="history-list is-hidden" data-agent="xiaoxiaomi">
+                    <div class="history-item" data-hist-idx="7">
+                      <img class="history-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                      <span>帮我写一封商务邮件</span>
+                    </div>
+                    <div class="history-item" data-hist-idx="8">
+                      <img class="history-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                      <span>整理今天的会议纪要</span>
+                    </div>
+                    <div class="history-item" data-hist-idx="9">
+                      <img class="history-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                      <span>安排明天的会议</span>
+                    </div>
+                    <div class="history-item history-hidden" data-hist-idx="10">
+                      <img class="history-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                      <span>帮我回复这封催办邮件</span>
+                    </div>
+                    <div class="history-item history-more" data-agent-more="xiaoxiaomi">
+                      <img class="history-icon" src="./figma-assets/214502a9-fe9d-4037-98f1-24cbe63dd3ac.svg" alt="" />
+                      <span>查看更多</span>
+                    </div>
+                  </nav>
+                </section>
+
+                <section class="agent-block secondary-block">
+                  <div class="secondary-agent" data-agent="xialiuda">
+                    <img
+                      class="agent-avatar"
+                      src="https://www.figma.com/api/mcp/asset/99b853ee-2334-4d97-9d2d-34b5cb63d180"
+                      alt=""
+                    />
+                    <span class="agent-copy">
+                      <strong>虾溜达</strong>
+                      <small>翻攻略、画路线、找美食，说走就走</small>
+                    </span>
+                  </div>
+
+                  <nav class="history-list is-hidden" data-agent="xialiuda">
+                    <div class="history-item" data-hist-idx="11">
+                      <img class="history-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                      <span>帮我规划三亚五日游</span>
+                    </div>
+                    <div class="history-item" data-hist-idx="12">
+                      <img class="history-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                      <span>推荐几家成都特色火锅</span>
+                    </div>
+                    <div class="history-item" data-hist-idx="13">
+                      <img class="history-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                      <span>帮我查一下明天的天气</span>
+                    </div>
+                    <div class="history-item history-hidden" data-hist-idx="14">
+                      <img class="history-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                      <span>做一个日本樱花季旅行攻略</span>
+                    </div>
+                    <div class="history-item history-more" data-agent-more="xialiuda">
+                      <img class="history-icon" src="./figma-assets/214502a9-fe9d-4037-98f1-24cbe63dd3ac.svg" alt="" />
+                      <span>查看更多</span>
+                    </div>
+                  </nav>
+                </section>
+
+                <div class="sidebar-bottom">
+                  <div class="create-agent-button">
+                    <img src="./figma-assets/ddce7355-5b30-418e-9faa-cbe8f7dde45d.svg" alt="" />
+                    <span>新建一只虾</span>
+                  </div>
+
+                  <nav class="sidebar-links">
+                    <div class="sidebar-link" id="sidebar-skill-market">
+                      <img src="./figma-assets/974532bf-2194-4a7e-b4e3-9ed4d39ec017.svg" alt="" />
+                      <span>技能广场</span>
+                    </div>
+                    <div class="sidebar-link" id="sidebar-scheduled-tasks">
+                      <img src="https://www.figma.com/api/mcp/asset/5012dedc-47fd-4fba-9205-35ee583a6d1c" alt="" />
+                      <span>定时任务</span>
+                    </div>
+                  </nav>
+                </div>
+              </div>
+            </div>
+
+            <!-- Collapsed state -->
+            <div class="sidebar-collapsed" id="sidebar-collapsed">
+              <div class="collapsed-top">
+                <img
+                  class="sidebar-toggle-btn"
+                  id="sidebar-expand-btn"
+                  src="./figma-assets/cb300e07-9636-4517-ba6d-23e38d9356c9.svg"
+                  alt=""
+                />
+                <div class="collapsed-active-wrap">
+                  <img class="collapsed-active-img" src="https://www.figma.com/api/mcp/asset/716c7761-9506-48c4-b3e3-f805624601bc" alt="" />
+                </div>
+                <div class="collapsed-agent-item">
+                  <img class="collapsed-avatar" src="https://www.figma.com/api/mcp/asset/f031e834-a207-497b-a267-4d0e2960ecd1" alt="" />
+                </div>
+                <div class="collapsed-agent-item">
+                  <img class="collapsed-avatar" src="https://www.figma.com/api/mcp/asset/f031e834-a207-497b-a267-4d0e2960ecd1" alt="" />
+                </div>
+              </div>
+              <div class="collapsed-new-btn">
+                <img src="./figma-assets/ddce7355-5b30-418e-9faa-cbe8f7dde45d.svg" alt="" />
+              </div>
+              <div class="collapsed-nav">
+                <div class="collapsed-nav-item">
+                  <img class="collapsed-nav-icon-sm" src="./figma-assets/974532bf-2194-4a7e-b4e3-9ed4d39ec017.svg" alt="" />
+                </div>
+                <div class="collapsed-nav-item">
+                  <img class="collapsed-nav-icon-lg" src="https://www.figma.com/api/mcp/asset/61f9fdf8-6cb5-4d4f-b6f9-3ef4f2cc023b" alt="" />
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <div class="main-area-wrap" id="main-area-wrap">
+          <section class="main-stage">
+            <div class="main-stage-scroll" id="main-stage-scroll">
+              <div class="main-stage-scroll-inner">
+              <section class="welcome-panel" id="welcome-panel">
+                <div class="hero-brand">
+                  <div class="logo-group">
+                    <div class="brand-mark">
+                      <img
+                        class="brand-image"
+                        src="./figma-assets/bdd4dc24-5b5f-4d23-93d7-feff0d68bbc7.png"
+                        alt=""
+                      />
+                      <span class="beta-pill">Beta</span>
+                    </div>
+                    <h1 class="welcome-headline">Hi，我是虾管家</h1>
+                  </div>
+                  <p class="welcome-tagline">开箱即用，越用越新，7x24不断线，全设备可用的超级助理</p>
+                </div>
+
+                <div class="quick-actions" id="quick-actions">
+                  <div class="quick-card">
+                    <div class="quick-card-text">
+                      <strong>专属定制</strong>
+                      <small>让虾管家更懂你的偏好</small>
+                    </div>
+                    <span class="quick-illus" aria-hidden="true">
+                      <img src="./custom-assets/quick-custom.png" alt="" />
+                    </span>
+                  </div>
+                  <div class="quick-card">
+                    <div class="quick-card-text">
+                      <strong>技能推荐</strong>
+                      <small>按当前任务推荐合适技能</small>
+                    </div>
+                    <span class="quick-illus" aria-hidden="true">
+                      <img src="./custom-assets/quick-skill.png" alt="" />
+                    </span>
+                  </div>
+                  <div class="quick-card">
+                    <div class="quick-card-text">
+                      <strong>一键成军</strong>
+                      <small>快速搭好你的专属虾队</small>
+                    </div>
+                    <span class="quick-illus" aria-hidden="true">
+                      <img src="./custom-assets/quick-squad.png" alt="" />
+                    </span>
+                  </div>
+                </div>
+              </section>
+
+              <section class="skills-market-page" id="skills-market-page" style="display: none;">
+                <div class="skills-market-container">
+                  <div class="skills-market-header">
+                    <div class="skills-market-title">技能广场</div>
+                    <div class="skills-market-actions">
+                      <div class="skills-market-search" role="search">
+                        <img class="skills-market-search-icon" src="./icon/skills-search.svg" alt="" />
+                        <input class="skills-market-search-input" placeholder="搜索技能名称、描述或标签" />
+                        <div class="skills-market-autocomplete" id="skills-market-autocomplete" role="listbox" aria-label="搜索联想"></div>
+                      </div>
+                      <button class="skills-market-btn skills-market-btn-ghost" type="button">
+                        <img class="skills-market-btn-icon" src="./icon/skills-manage.svg" alt="" />
+                        管理技能
+                      </button>
+                      <div class="skills-market-create-wrap">
+                      <button class="skills-market-btn skills-market-btn-primary" type="button">
+                        <img class="skills-market-btn-icon" src="./icon/skills-add.svg" alt="" />
+                        新建技能
+                      </button>
+                      <div class="skills-market-create-hover" aria-hidden="true">
+                        <div class="skills-market-create-hover-item">
+                          <span class="skills-market-create-hover-icon" aria-hidden="true">
+                            <img src="./icon/skills-create-by-chat.svg" alt="" />
+                          </span>
+                          <span class="skills-market-create-hover-text">
+                            <span class="skills-market-create-hover-title">使用对话新建</span>
+                            <span class="skills-market-create-hover-desc">描述你的需求，AI 帮你生成</span>
+                          </span>
+                        </div>
+                      </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="skills-market-tabs" role="tablist" aria-label="技能分类">
+                    <button class="skills-market-tab is-active" type="button">精选</button>
+                    <button class="skills-market-tab" type="button">工作</button>
+                    <button class="skills-market-tab" type="button">学习</button>
+                    <button class="skills-market-tab" type="button">游戏</button>
+                    <button class="skills-market-tab" type="button">娱乐</button>
+                  </div>
+
+                  <div class="skills-card-grid">
+                  <article class="skills-card">
+                    <div class="skills-card-top">
+                      <img class="skills-card-icon" src="./icon/skill-1.png" alt="" />
+                      <span class="skills-card-badge">
+                        <span class="skills-card-badge-icon" aria-hidden="true">
+                          <img class="skills-card-badge-success" src="./icon/成功.svg" alt="" />
+                        </span>
+                        <span>已添加</span>
+                      </span>
+                    </div>
+                    <div class="skills-card-body">
+                      <h3 class="skills-card-title">AI 文本优化</h3>
+                      <p class="skills-card-desc">识别和去除 AI 生成文本的痕迹，使文字听起来更自然、更有人味</p>
+                    </div>
+                    <div class="skills-card-footer">
+                      <div class="skills-card-tags">
+                        <span class="skills-card-tag">写作</span>
+                        <span class="skills-card-tag">内容优化</span>
+                      </div>
+                      <div class="skills-card-meta">7.3k 添加</div>
+                    </div>
+                  </article>
+
+                  <article class="skills-card">
+                    <div class="skills-card-top">
+                      <img class="skills-card-icon" src="./icon/skill-3.png" alt="" />
+                    </div>
+                    <div class="skills-card-body">
+                      <h3 class="skills-card-title">营销文案创作</h3>
+                      <p class="skills-card-desc">用于为任意页面撰写、改写或优化营销文案，包括首页、落地页、定价页、功能页、关于页或…</p>
+                    </div>
+                    <div class="skills-card-footer">
+                      <div class="skills-card-tags">
+                        <span class="skills-card-tag">营销</span>
+                        <span class="skills-card-tag">写作</span>
+                      </div>
+                      <div class="skills-card-meta">3.3k 添加</div>
+                    </div>
+                  </article>
+
+                  <article class="skills-card">
+                    <div class="skills-card-top">
+                      <img class="skills-card-icon" src="./icon/skill-8.png" alt="" />
+                    </div>
+                    <div class="skills-card-body">
+                      <h3 class="skills-card-title">客户研究分析</h3>
+                      <p class="skills-card-desc">采用多源研究方法，对信息来源进行优先级评估，并综合不同来源的内容生成结论，同时提…</p>
+                    </div>
+                    <div class="skills-card-footer">
+                      <div class="skills-card-tags">
+                        <span class="skills-card-tag">调研</span>
+                        <span class="skills-card-tag">市场调研</span>
+                        <span class="skills-card-tag">营销</span>
+                      </div>
+                      <div class="skills-card-meta">2.9k 添加</div>
+                    </div>
+                  </article>
+
+                  <article class="skills-card">
+                    <div class="skills-card-top">
+                      <img class="skills-card-icon" src="./icon/skill-2.png" alt="" />
+                    </div>
+                    <div class="skills-card-body">
+                      <h3 class="skills-card-title">营销心理分析</h3>
+                      <p class="skills-card-desc">将心理学原理、思维模型、行为科学应用到营销中，增强用户对内容的理解与接受度</p>
+                    </div>
+                    <div class="skills-card-footer">
+                      <div class="skills-card-tags">
+                        <span class="skills-card-tag">写作</span>
+                        <span class="skills-card-tag">内容优化</span>
+                      </div>
+                      <div class="skills-card-meta">7.3k 添加</div>
+                    </div>
+                  </article>
+
+                  <article class="skills-card">
+                    <div class="skills-card-top">
+                      <img class="skills-card-icon" src="./icon/skill-4.png" alt="" />
+                    </div>
+                    <div class="skills-card-body">
+                      <h3 class="skills-card-title">营销心理分析</h3>
+                      <p class="skills-card-desc">将心理学原理、思维模型、行为科学应用到营销中，增强用户提及以下内容的理解与接受度</p>
+                    </div>
+                    <div class="skills-card-footer">
+                      <div class="skills-card-tags">
+                        <span class="skills-card-tag">写作</span>
+                        <span class="skills-card-tag">内容优化</span>
+                      </div>
+                      <div class="skills-card-meta">2.8k 添加</div>
+                    </div>
+                  </article>
+
+                  <article class="skills-card">
+                    <div class="skills-card-top">
+                      <img class="skills-card-icon" src="./icon/skill-5.png" alt="" />
+                      <span class="skills-card-badge">
+                        <span class="skills-card-badge-icon" aria-hidden="true">
+                          <img class="skills-card-badge-success" src="./icon/成功.svg" alt="" />
+                        </span>
+                        <span>已添加</span>
+                      </span>
+                    </div>
+                    <div class="skills-card-body">
+                      <h3 class="skills-card-title">用户洞察提炼</h3>
+                      <p class="skills-card-desc">通过主题分析、亲和图分析法、用户画像构建和机会规模评估，将访谈笔记、调查数据和客服…</p>
+                    </div>
+                    <div class="skills-card-footer">
+                      <div class="skills-card-tags">
+                        <span class="skills-card-tag">产品</span>
+                        <span class="skills-card-tag">调研</span>
+                      </div>
+                      <div class="skills-card-meta">4.0k 添加</div>
+                    </div>
+                  </article>
+
+                  <article class="skills-card">
+                    <div class="skills-card-top">
+                      <img class="skills-card-icon" src="./icon/skill-6.png" alt="" />
+                    </div>
+                    <div class="skills-card-body">
+                      <h3 class="skills-card-title">营销策划</h3>
+                      <p class="skills-card-desc">提供 SaaS 或软件产品的营销创意、灵感或策略。当用户提及以下内容时适用：营销创意、…</p>
+                    </div>
+                    <div class="skills-card-footer">
+                      <div class="skills-card-tags">
+                        <span class="skills-card-tag">营销</span>
+                        <span class="skills-card-tag">规划</span>
+                      </div>
+                      <div class="skills-card-meta">2.9k 添加</div>
+                    </div>
+                  </article>
+
+                  <article class="skills-card">
+                    <div class="skills-card-top">
+                      <img class="skills-card-icon" src="./icon/skill-1.png" alt="" />
+                    </div>
+                    <div class="skills-card-body">
+                      <h3 class="skills-card-title">AI 文本优化</h3>
+                      <p class="skills-card-desc">识别和去除 AI 生成文本的痕迹，使文字听起来更自然、更有人味</p>
+                    </div>
+                    <div class="skills-card-footer">
+                      <div class="skills-card-tags">
+                        <span class="skills-card-tag">写作</span>
+                        <span class="skills-card-tag">内容优化</span>
+                      </div>
+                      <div class="skills-card-meta">7.3k 添加</div>
+                    </div>
+                  </article>
+
+                  <article class="skills-card">
+                    <div class="skills-card-top">
+                      <img class="skills-card-icon" src="./icon/skill-3.png" alt="" />
+                      <span class="skills-card-badge">
+                        <span class="skills-card-badge-icon" aria-hidden="true">
+                          <img class="skills-card-badge-success" src="./icon/成功.svg" alt="" />
+                        </span>
+                        <span>已添加</span>
+                      </span>
+                    </div>
+                    <div class="skills-card-body">
+                      <h3 class="skills-card-title">营销文案创作</h3>
+                      <p class="skills-card-desc">用于为任意页面撰写、改写或优化营销文案，包括首页、落地页、定价页、功能页、关于页或…</p>
+                    </div>
+                    <div class="skills-card-footer">
+                      <div class="skills-card-tags">
+                        <span class="skills-card-tag">营销</span>
+                        <span class="skills-card-tag">写作</span>
+                      </div>
+                      <div class="skills-card-meta">3.3k 添加</div>
+                    </div>
+                  </article>
+
+                  <article class="skills-card">
+                    <div class="skills-card-top">
+                      <img class="skills-card-icon" src="./icon/skill-7.png" alt="" />
+                      <span class="skills-card-badge">
+                        <span class="skills-card-badge-icon" aria-hidden="true">
+                          <img class="skills-card-badge-success" src="./icon/成功.svg" alt="" />
+                        </span>
+                        <span>已添加</span>
+                      </span>
+                    </div>
+                    <div class="skills-card-body">
+                      <h3 class="skills-card-title">产品路线图设计</h3>
+                      <p class="skills-card-desc">使用 RICE、MoSCoW 等优先级框架以及依赖关系映射来制定产品路线图，并支持路线图的更…</p>
+                    </div>
+                    <div class="skills-card-footer">
+                      <div class="skills-card-tags">
+                        <span class="skills-card-tag">写作</span>
+                        <span class="skills-card-tag">规划</span>
+                      </div>
+                      <div class="skills-card-meta">7.3k 添加</div>
+                    </div>
+                  </article>
+
+                  <article class="skills-card">
+                    <div class="skills-card-top">
+                      <img class="skills-card-icon" src="./icon/skill-6.png" alt="" />
+                      <span class="skills-card-badge">
+                        <span class="skills-card-badge-icon" aria-hidden="true">
+                          <img class="skills-card-badge-success" src="./icon/成功.svg" alt="" />
+                        </span>
+                        <span>已添加</span>
+                      </span>
+                    </div>
+                    <div class="skills-card-body">
+                      <h3 class="skills-card-title">产品方案梳理</h3>
+                      <p class="skills-card-desc">在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问的方式，将模糊的产品需求…</p>
+                    </div>
+                    <div class="skills-card-footer">
+                      <div class="skills-card-tags">
+                        <span class="skills-card-tag">产品</span>
+                        <span class="skills-card-tag">文档</span>
+                        <span class="skills-card-tag">规划</span>
+                      </div>
+                      <div class="skills-card-meta">5.7k 添加</div>
+                    </div>
+                  </article>
+
+                  <article class="skills-card">
+                    <div class="skills-card-top">
+                      <img class="skills-card-icon" src="./icon/skill-9.png" alt="" />
+                    </div>
+                    <div class="skills-card-body">
+                      <h3 class="skills-card-title">内容选题规划</h3>
+                      <p class="skills-card-desc">用于规划内容策略、决定创作方向或确定选题。当用户提及以下内容时适用：内容策略、“该…</p>
+                    </div>
+                    <div class="skills-card-footer">
+                      <div class="skills-card-tags">
+                        <span class="skills-card-tag">营销</span>
+                        <span class="skills-card-tag">规划</span>
+                      </div>
+                      <div class="skills-card-meta">3.7k 添加</div>
+                    </div>
+                  </article>
+                </div>
+
+                <div class="all-skills-section">
+                  <div class="all-skills-header">
+                    <div class="all-skills-title">全部技能</div>
+                    <button class="all-skills-sort" type="button">
+                      <span class="all-skills-sort-icon" aria-hidden="true"></span>
+                      <span>排序</span>
+                    </button>
+                  </div>
+
+                  <div class="all-skills-grid">
+                    <article class="all-skill-card">
+                      <img class="all-skill-icon" src="./icon/skill-2.png" alt="" />
+                      <div class="all-skill-main">
+                        <div class="all-skill-row">
+                          <div class="all-skill-title-tags">
+                            <div class="all-skill-name">产品方案梳理</div>
+                            <div class="all-skill-tags">
+                              <span class="all-skill-tag">产品</span>
+                              <span class="all-skill-tag">文档</span>
+                              <span class="all-skill-tag">规划</span>
+                            </div>
+                          </div>
+                          <span class="skills-card-badge">
+                            <span class="skills-card-badge-icon" aria-hidden="true">
+                              <img class="skills-card-badge-success" src="./icon/成功.svg" alt="" />
+                            </span>
+                            <span>已添加</span>
+                          </span>
+                        </div>
+                        <div class="all-skill-desc">brainstorming: 在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问的方式，将模糊的产品需求转为为清晰可交付的文档。</div>
+                      </div>
+                    </article>
+
+                    <article class="all-skill-card">
+                      <img class="all-skill-icon" src="./icon/skill-1.png" alt="" />
+                      <div class="all-skill-main">
+                        <div class="all-skill-row">
+                          <div class="all-skill-title-tags">
+                            <div class="all-skill-name">AI 文本优化</div>
+                            <div class="all-skill-tags">
+                              <span class="all-skill-tag">写作</span>
+                              <span class="all-skill-tag">内容优化</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="all-skill-desc">brainstorming: 在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问的方式，将模糊的产品需求转为为清晰可交付的文档。</div>
+                      </div>
+                    </article>
+
+                    <article class="all-skill-card">
+                      <img class="all-skill-icon" src="./icon/skill-5.png" alt="" />
+                      <div class="all-skill-main">
+                        <div class="all-skill-row">
+                          <div class="all-skill-title-tags">
+                            <div class="all-skill-name">用户洞察提炼</div>
+                            <div class="all-skill-tags">
+                              <span class="all-skill-tag">产品</span>
+                              <span class="all-skill-tag">调研</span>
+                              <span class="all-skill-tag">数据分析</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="all-skill-desc">brainstorming: 在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问的方式，将模糊的产品需求转为为清晰可交付的文档。</div>
+                      </div>
+                    </article>
+
+                    <article class="all-skill-card">
+                      <img class="all-skill-icon" src="./icon/skill-3.png" alt="" />
+                      <div class="all-skill-main">
+                        <div class="all-skill-row">
+                          <div class="all-skill-title-tags">
+                            <div class="all-skill-name">产品方案梳理</div>
+                            <div class="all-skill-tags">
+                              <span class="all-skill-tag">产品</span>
+                              <span class="all-skill-tag">文档</span>
+                              <span class="all-skill-tag">规划</span>
+                            </div>
+                          </div>
+                          <span class="skills-card-badge">
+                            <span class="skills-card-badge-icon" aria-hidden="true">
+                              <img class="skills-card-badge-success" src="./icon/成功.svg" alt="" />
+                            </span>
+                            <span>已添加</span>
+                          </span>
+                        </div>
+                        <div class="all-skill-desc">brainstorming: 在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问的方式，将模糊的产品需求转为为清晰可交付的文档。</div>
+                      </div>
+                    </article>
+
+                    <article class="all-skill-card">
+                      <img class="all-skill-icon" src="./icon/skill-7.png" alt="" />
+                      <div class="all-skill-main">
+                        <div class="all-skill-row">
+                          <div class="all-skill-title-tags">
+                            <div class="all-skill-name">产品路线图设计</div>
+                            <div class="all-skill-tags">
+                              <span class="all-skill-tag">产品</span>
+                              <span class="all-skill-tag">规划</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="all-skill-desc">brainstorming: 在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问的方式，将模糊的产品需求转为为清晰可交付的文档。</div>
+                      </div>
+                    </article>
+
+                    <article class="all-skill-card">
+                      <img class="all-skill-icon" src="./icon/skill-6.png" alt="" />
+                      <div class="all-skill-main">
+                        <div class="all-skill-row">
+                          <div class="all-skill-title-tags">
+                            <div class="all-skill-name">产品方案梳理</div>
+                            <div class="all-skill-tags">
+                              <span class="all-skill-tag">营销</span>
+                              <span class="all-skill-tag">规划</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="all-skill-desc">brainstorming: 在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问的方式，将模糊的产品需求转为为清晰可交付的文档。</div>
+                      </div>
+                    </article>
+
+                    <article class="all-skill-card">
+                      <img class="all-skill-icon" src="./icon/skill-8.png" alt="" />
+                      <div class="all-skill-main">
+                        <div class="all-skill-row">
+                          <div class="all-skill-title-tags">
+                            <div class="all-skill-name">产品方案梳理</div>
+                            <div class="all-skill-tags">
+                              <span class="all-skill-tag">产品</span>
+                              <span class="all-skill-tag">文档</span>
+                              <span class="all-skill-tag">规划</span>
+                            </div>
+                          </div>
+                          <span class="skills-card-badge">
+                            <span class="skills-card-badge-icon" aria-hidden="true">
+                              <img class="skills-card-badge-success" src="./icon/成功.svg" alt="" />
+                            </span>
+                            <span>已添加</span>
+                          </span>
+                        </div>
+                        <div class="all-skill-desc">brainstorming: 在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问的方式，将模糊的产品需求转为为清晰可交付的文档。</div>
+                      </div>
+                    </article>
+
+                    <article class="all-skill-card">
+                      <img class="all-skill-icon" src="./icon/skill-9.png" alt="" />
+                      <div class="all-skill-main">
+                        <div class="all-skill-row">
+                          <div class="all-skill-title-tags">
+                            <div class="all-skill-name">产品方案梳理</div>
+                            <div class="all-skill-tags">
+                              <span class="all-skill-tag">产品</span>
+                              <span class="all-skill-tag">文档</span>
+                              <span class="all-skill-tag">规划</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="all-skill-desc">brainstorming: 在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问的方式，将模糊的产品需求转为为清晰可交付的文档。</div>
+                      </div>
+                    </article>
+
+                    <article class="all-skill-card">
+                      <img class="all-skill-icon" src="./icon/skill-2.png" alt="" />
+                      <div class="all-skill-main">
+                        <div class="all-skill-row">
+                          <div class="all-skill-title-tags">
+                            <div class="all-skill-name">产品方案梳理</div>
+                            <div class="all-skill-tags">
+                              <span class="all-skill-tag">产品</span>
+                              <span class="all-skill-tag">文档</span>
+                              <span class="all-skill-tag">规划</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="all-skill-desc">brainstorming: 在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问的方式，将模糊的产品需求转为为清晰可交付的文档。</div>
+                      </div>
+                    </article>
+
+                    <article class="all-skill-card">
+                      <img class="all-skill-icon" src="./icon/skill-10.png" alt="" />
+                      <div class="all-skill-main">
+                        <div class="all-skill-row">
+                          <div class="all-skill-title-tags">
+                            <div class="all-skill-name">产品方案梳理</div>
+                            <div class="all-skill-tags">
+                              <span class="all-skill-tag">产品</span>
+                              <span class="all-skill-tag">文档</span>
+                              <span class="all-skill-tag">规划</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="all-skill-desc">brainstorming: 在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问的方式，将模糊的产品需求转为为清晰可交付的文档。</div>
+                      </div>
+                    </article>
+
+                    <article class="all-skill-card">
+                      <img class="all-skill-icon" src="./icon/skill-2.png" alt="" />
+                      <div class="all-skill-main">
+                        <div class="all-skill-row">
+                          <div class="all-skill-title-tags">
+                            <div class="all-skill-name">产品方案梳理</div>
+                            <div class="all-skill-tags">
+                              <span class="all-skill-tag">产品</span>
+                              <span class="all-skill-tag">文档</span>
+                              <span class="all-skill-tag">规划</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="all-skill-desc">brainstorming: 在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问的方式，将模糊的产品需求转为为清晰可交付的文档。</div>
+                      </div>
+                    </article>
+
+                    <article class="all-skill-card">
+                      <img class="all-skill-icon" src="./icon/skill-2.png" alt="" />
+                      <div class="all-skill-main">
+                        <div class="all-skill-row">
+                          <div class="all-skill-title-tags">
+                            <div class="all-skill-name">产品方案梳理</div>
+                            <div class="all-skill-tags">
+                              <span class="all-skill-tag">产品</span>
+                              <span class="all-skill-tag">文档</span>
+                              <span class="all-skill-tag">规划</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="all-skill-desc">brainstorming: 在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问的方式，将模糊的产品需求转为为清晰可交付的文档。</div>
+                      </div>
+                    </article>
+
+                    <article class="all-skill-card">
+                      <img class="all-skill-icon" src="./icon/skill-2.png" alt="" />
+                      <div class="all-skill-main">
+                        <div class="all-skill-row">
+                          <div class="all-skill-title-tags">
+                            <div class="all-skill-name">产品方案梳理</div>
+                            <div class="all-skill-tags">
+                              <span class="all-skill-tag">产品</span>
+                              <span class="all-skill-tag">文档</span>
+                              <span class="all-skill-tag">规划</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="all-skill-desc">brainstorming: 在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问的方式，将模糊的产品需求转为为清晰可交付的文档。</div>
+                      </div>
+                    </article>
+
+                    <article class="all-skill-card">
+                      <img class="all-skill-icon" src="./icon/skill-2.png" alt="" />
+                      <div class="all-skill-main">
+                        <div class="all-skill-row">
+                          <div class="all-skill-title-tags">
+                            <div class="all-skill-name">产品方案梳理</div>
+                            <div class="all-skill-tags">
+                              <span class="all-skill-tag">产品</span>
+                              <span class="all-skill-tag">文档</span>
+                              <span class="all-skill-tag">规划</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="all-skill-desc">brainstorming: 在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问的方式，将模糊的产品需求转为为清晰可交付的文档。</div>
+                      </div>
+                    </article>
+                  </div>
+
+                  <div class="all-skills-loading">
+                    <div class="all-skills-loading-pill">
+                      <span class="all-skills-loading-spin" aria-hidden="true"></span>
+                      <span>加载中...</span>
+                    </div>
+                  </div>
+                </div>
+                </div>
+              </section>
+
+              <!-- Skills Detail Modal (Figma 1966:35052) -->
+              <div class="skills-detail-overlay" id="skills-detail-overlay" aria-hidden="true">
+                <div class="skills-detail-modal" role="dialog" aria-modal="true" aria-label="技能详情">
+                  <div class="skills-detail-titlebar">
+                    <button class="skills-detail-close-btn" type="button" aria-label="关闭">
+                      <img src="./icon/skills-detail-close.svg" alt="" />
+                    </button>
+                  </div>
+
+                  <div class="skills-detail-body">
+                    <div class="skills-detail-hero">
+                      <div class="skills-detail-icon">
+                        <img id="skills-detail-icon" src="./icon/skill-1.png" alt="" />
+                      </div>
+                      <div class="skills-detail-head">
+                        <div class="skills-detail-title" id="skills-detail-title">客户研究分析</div>
+                        <div class="skills-detail-tags" id="skills-detail-tags">
+                          <span class="skills-detail-tag">调研</span>
+                          <span class="skills-detail-tag">市场调研</span>
+                          <span class="skills-detail-tag">营销</span>
+                        </div>
+                      </div>
+                      <div class="skills-detail-desc" id="skills-detail-desc">
+                        customer-research: 采用多源研究方法，对信息来源进行优先级评估，并综合不同来源的内容生成结论，同时提供置信度评分。
+                      </div>
+                    </div>
+
+                    <div class="skills-detail-meta">
+                      <div class="skills-detail-meta-item">
+                        <div class="skills-detail-meta-val" id="skills-detail-author">Pingo 等</div>
+                        <div class="skills-detail-meta-key">开发者</div>
+                      </div>
+                      <div class="skills-detail-meta-divider"></div>
+                      <div class="skills-detail-meta-item">
+                        <div class="skills-detail-meta-val" id="skills-detail-count">3.1k</div>
+                        <div class="skills-detail-meta-key">添加次数</div>
+                      </div>
+                      <div class="skills-detail-meta-divider"></div>
+                      <div class="skills-detail-meta-item">
+                        <div class="skills-detail-meta-val" id="skills-detail-source">Github</div>
+                        <div class="skills-detail-meta-key">来源</div>
+                      </div>
+                      <div class="skills-detail-meta-divider"></div>
+                      <div class="skills-detail-meta-item">
+                        <div class="skills-detail-meta-val" id="skills-detail-updated">2026.04.10</div>
+                        <div class="skills-detail-meta-key">更新时间</div>
+                      </div>
+                    </div>
+
+                    <div class="skills-detail-added">
+                      <div class="skills-detail-avatars" aria-hidden="true">
+                        <img class="skills-detail-avatar" src="./icon/skills-detail-avatar1.png" alt="" />
+                        <img class="skills-detail-avatar" src="./icon/skills-detail-avatar2.png" alt="" />
+                      </div>
+                      <div class="skills-detail-added-text" id="skills-detail-added">已添加到 2 只虾</div>
+                    </div>
+                  </div>
+
+                  <div class="skills-detail-footer">
+                    <button class="skills-detail-primary" type="button">去添加</button>
+                    <div class="skills-detail-foot">
+                      <img class="skills-detail-safe-icon" src="./icon/skills-detail-safe.svg" alt="" />
+                      <span>已通过安全与合规验证，无恶意代码或数据泄露风险。</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Choose Shrimp Modal (Figma 1966:33662) -->
+              <div class="choose-shrimp-overlay" id="choose-shrimp-overlay" aria-hidden="true">
+                <div class="choose-shrimp-modal" role="dialog" aria-modal="true" aria-label="添加到你的虾">
+                  <div class="choose-shrimp-titlebar">
+                    <div class="choose-shrimp-title">添加到你的虾</div>
+                    <button class="choose-shrimp-close" id="choose-shrimp-close" type="button" aria-label="关闭">
+                      <img src="./icon/skills-detail-close.svg" alt="" />
+                    </button>
+                  </div>
+
+                  <div class="choose-shrimp-body" id="choose-shrimp-list" role="listbox" aria-label="虾列表"></div>
+
+                  <div class="choose-shrimp-footer">
+                    <button class="choose-shrimp-selectall" id="choose-shrimp-selectall" type="button" aria-pressed="false">
+                      <span class="choose-shrimp-checkbox" aria-hidden="true">
+                        <span class="choose-shrimp-checkbox-bg"></span>
+                        <span class="choose-shrimp-checkbox-box"></span>
+                        <img class="choose-shrimp-checkbox-tick" src="./icon/checkbox-check.svg" alt="" />
+                      </span>
+                      <span class="choose-shrimp-selectall-text">全选</span>
+                    </button>
+                    <div class="choose-shrimp-footer-actions">
+                      <button class="choose-shrimp-cancel" id="choose-shrimp-cancel" type="button">取消</button>
+                      <button class="choose-shrimp-confirm" id="choose-shrimp-confirm" type="button" disabled>确认</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="conversation-thread" id="conversation-thread" style="display: none;">
+                <!-- Messages will be dynamically inserted here -->
+              </div>
+              </div>
+            </div>
+
+            <!-- Add success toast (Figma 1966:37290 / 1966:39470) -->
+            <div class="add-success-toast" id="add-success-toast" aria-hidden="true">
+              <span class="add-success-toast-icon" aria-hidden="true">
+                <img class="add-success-toast-union" src="./icon/toast-success-union.svg" alt="" />
+                <img class="add-success-toast-check" src="./icon/toast-success-check.svg" alt="" />
+              </span>
+              <span class="add-success-toast-text">添加成功</span>
+              <button class="add-success-toast-close" id="add-success-toast-close" type="button" aria-label="关闭提示">
+                <img src="./icon/skills-detail-close.svg" alt="" />
+              </button>
+            </div>
+
+            <form class="composer-shell" id="composer-form">
+              <div class="composer-glow"></div>
+              <div class="composer-card">
+                <div class="composer-input-wrap">
+                  <div
+                    id="prompt-input"
+                    class="prompt-editor"
+                    contenteditable="true"
+                    role="textbox"
+                    aria-multiline="true"
+                    data-placeholder="输入任务描述或提问任何问题"
+                  ></div>
+                </div>
+                <div class="composer-toolbar">
+                  <div class="toolbar-left">
+                    <div class="pill-select">
+                      <img
+                        class="pill-icon"
+                        src="./figma-assets/35f8a29a-f976-4b69-92a3-3a2b103d2b72.svg"
+                        alt=""
+                      />
+                      <span>技能</span>
+                    </div>
+                    <div class="pill-select">
+                      <span class="pill-icon-mention">
+                        <img src="./figma-assets/79262c1d-2ec7-4747-bf32-b2b2cce515d1.svg" alt="" />
+                      </span>
+                      <span>提及</span>
+                    </div>
+                  </div>
+                  <div class="toolbar-right">
+                    <div class="tool-group-wrap">
+                      <div class="tool-group">
+                        <div class="tool-icon">
+                          <img src="./文件.svg" alt="" />
+                        </div>
+                        <div class="tool-icon">
+                          <img src="./图片.svg" alt="" />
+                        </div>
+                        <div class="tool-icon">
+                          <img src="./语音.svg" alt="" />
+                        </div>
+                      </div>
+                      <span class="toolbar-divider"></span>
+                    </div>
+                    <button class="send-button" type="button">
+                      <img src="./send.svg" alt="" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </section>
+
+          <!-- File Preview Panel (3rd grid column) -->
+          <div class="preview-panel" id="preview-panel">
+            <div class="preview-header">
+              <div class="preview-title">
+                <span class="preview-file-name" id="preview-file-name">高中物理周测试卷：牛顿第一定律.pdf</span>
+              </div>
+              <div class="preview-actions">
+                <div class="preview-action-btn" id="preview-close">
+                  <img src="./figma-assets/d434c192-59c8-4ac8-921a-c99f9961f781.svg" alt="" />
+                </div>
+              </div>
+            </div>
+            <div class="preview-divider"></div>
+            <div class="preview-content">
+              <img class="preview-image" id="preview-image" src="./figma-assets/a3d8d6f5-e399-4108-be4b-06175be4e067.png" alt="" />
+            </div>
+          </div>
+          </div>
+
+          <!-- History Panel -->
+          <div class="side-float-panel" id="history-panel">
+            <div class="sfp-header">
+              <div class="sfp-title">
+                <div class="sfp-title-icon">
+                  <img src="./figma-assets/943e5836-dc3f-4649-b350-d6d53802ca17.svg" alt="" />
+                </div>
+              </div>
+              <div class="sfp-close" id="history-close">
+                <img src="./figma-assets/d434c192-59c8-4ac8-921a-c99f9961f781.svg" alt="" />
+              </div>
+            </div>
+            <div class="sfp-search">
+              <img class="sfp-search-icon" src="./figma-assets/79262c1d-2ec7-4747-bf32-b2b2cce515d1.svg" alt="" />
+              <span class="sfp-search-placeholder">搜索</span>
+            </div>
+            <div class="sfp-body">
+              <div class="history-group">
+                <div class="history-group-label">今天</div>
+                <div class="history-conv-item is-active">
+                  <img class="history-conv-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                  <span>每天上午10点为我推送今天的新闻热点</span>
+                </div>
+                <div class="history-conv-item">
+                  <img class="history-conv-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                  <span>每周一上午9点为我整理周报</span>
+                </div>
+                <div class="history-conv-item">
+                  <img class="history-conv-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                  <span>定一个每天上班起床的闹钟</span>
+                </div>
+              </div>
+              <div class="history-group">
+                <div class="history-group-label">最近一周</div>
+                <div class="history-conv-item">
+                  <img class="history-conv-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                  <span>每天上午10点为我推送今天的新闻热点</span>
+                </div>
+                <div class="history-conv-item">
+                  <img class="history-conv-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                  <span>每周一上午9点为我整理周报</span>
+                </div>
+                <div class="history-conv-item">
+                  <img class="history-conv-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                  <span>每周一上午9点为我整理周报</span>
+                </div>
+                <div class="history-conv-item">
+                  <img class="history-conv-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                  <span>定一个每天上班起床的闹钟</span>
+                </div>
+              </div>
+              <div class="history-group">
+                <div class="history-group-label">最近一个月</div>
+                <div class="history-conv-item">
+                  <img class="history-conv-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                  <span>每天上午10点为我推送今天的新闻热点</span>
+                </div>
+                <div class="history-conv-item">
+                  <img class="history-conv-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                  <span>每周一上午9点为我整理周报</span>
+                </div>
+                <div class="history-conv-item">
+                  <img class="history-conv-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                  <span>定一个每天上班起床的闹钟</span>
+                </div>
+                <div class="history-conv-item">
+                  <img class="history-conv-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                  <span>定一个每天上班起床的闹钟</span>
+                </div>
+                <div class="history-conv-item">
+                  <img class="history-conv-icon" src="./figma-assets/c5bfdab3-8b28-41d7-8092-2efef30eca17.svg" alt="" />
+                  <span>定一个每天上班起床的闹钟</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agent Detail Panel -->
+          <div class="side-float-panel" id="agent-detail-panel">
+            <div class="sfp-header">
+              <div class="sfp-title">
+                <div class="sfp-title-icon">
+                  <img src="./figma-assets/31a5484d-800b-45f9-9edd-88087b498f6c.svg" alt="" />
+                </div>
+              </div>
+              <div class="sfp-close" id="agent-detail-close">
+                <img src="./figma-assets/d434c192-59c8-4ac8-921a-c99f9961f781.svg" alt="" />
+              </div>
+            </div>
+            <div class="sfp-body">
+              <div class="agent-detail-card">
+                <div class="agent-detail-avatar-wrap" aria-hidden="true">
+                  <div class="agent-detail-avatar-clip">
+                    <img class="agent-detail-avatar" src="./custom-assets/agent-xiaguanjia.png" alt="" />
+                  </div>
+                </div>
+                <div class="agent-detail-info">
+                  <span class="agent-detail-name">虾管家</span>
+                  <span class="agent-detail-desc">开箱即用，越用越新，7x24不断线，全设备可用的超级助理</span>
+                </div>
+              </div>
+              <div class="skill-section">
+                <div class="skill-section-header">
+                  <span>技能列表</span>
+                  <div class="skill-add-btn" id="btn-add-skill">
+                    <img src="./figma-assets/ddce7355-5b30-418e-9faa-cbe8f7dde45d.svg" alt="" />
+                  </div>
+                </div>
+                <div class="skill-list">
+                  <div class="skill-item">
+                    <img class="skill-item-icon" src="./figma-assets/c308e758-2811-46c3-9290-95da4a7d1345.png" alt="" />
+                    <span>热点资讯自动汇总</span>
+                    <div class="skill-item-remove">−</div>
+                  </div>
+                  <div class="skill-item">
+                    <img class="skill-item-icon" src="./figma-assets/36873bbb-eb65-4178-83af-dbe0044be520.png" alt="" />
+                    <span>热点资讯自动汇总</span>
+                    <div class="skill-item-remove">−</div>
+                  </div>
+                  <div class="skill-item">
+                    <img class="skill-item-icon" src="./figma-assets/61da691c-bfe5-4da7-a499-c38aa4bb1bfe.png" alt="" />
+                    <span>重复文件差异性对比</span>
+                    <div class="skill-item-remove">−</div>
+                  </div>
+                  <div class="skill-item skill-item-highlight">
+                    <img class="skill-item-icon" src="./figma-assets/4929ce66-3cb1-4b11-b265-7957898d4503.png" alt="" />
+                    <span>图文素材自动匹配</span>
+                    <div class="skill-item-remove">−</div>
+                  </div>
+                  <div class="skill-item">
+                    <img class="skill-item-icon" src="./figma-assets/4929ce66-3cb1-4b11-b265-7957898d4503.png" alt="" />
+                    <span>图文素材自动匹配</span>
+                    <div class="skill-item-remove">−</div>
+                  </div>
+                  <div class="skill-item">
+                    <img class="skill-item-icon" src="./figma-assets/36873bbb-eb65-4178-83af-dbe0044be520.png" alt="" />
+                    <span>热点资讯自动汇总</span>
+                    <div class="skill-item-remove">−</div>
+                  </div>
+                  <div class="skill-item">
+                    <img class="skill-item-icon" src="./figma-assets/4929ce66-3cb1-4b11-b265-7957898d4503.png" alt="" />
+                    <span>图文素材自动匹配</span>
+                    <div class="skill-item-remove">−</div>
+                  </div>
+                  <div class="skill-item">
+                    <img class="skill-item-icon" src="./figma-assets/61da691c-bfe5-4da7-a499-c38aa4bb1bfe.png" alt="" />
+                    <span>重复文件差异性对比</span>
+                    <div class="skill-item-remove">−</div>
+                  </div>
+                  <div class="skill-item">
+                    <img class="skill-item-icon" src="./figma-assets/4929ce66-3cb1-4b11-b265-7957898d4503.png" alt="" />
+                    <span>图文素材自动匹配</span>
+                    <div class="skill-item-remove">−</div>
+                  </div>
+                  <div class="skill-item">
+                    <img class="skill-item-icon" src="./figma-assets/36873bbb-eb65-4178-83af-dbe0044be520.png" alt="" />
+                    <span>热点资讯自动汇总</span>
+                    <div class="skill-item-remove">−</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- footer CTA removed per latest design -->
+          </div>
+
+          <!-- Add Skill Panel -->
+          <div class="side-float-panel" id="add-skill-panel">
+            <div class="sfp-header">
+              <div class="sfp-title">
+
+              </div>
+              <div class="sfp-close" id="add-skill-close">
+                <img src="./figma-assets/d434c192-59c8-4ac8-921a-c99f9961f781.svg" alt="" style="width:28px;height:28px;" />
+              </div>
+            </div>
+            <div class="add-skill-tabs">
+              <div class="add-skill-tab is-active">全部</div>
+              <div class="add-skill-tab">精选</div>
+              <div class="add-skill-tab">工作</div>
+              <div class="add-skill-tab">学习</div>
+              <div class="add-skill-tab">游戏</div>
+              <div class="add-skill-tab">娱乐</div>
+            </div>
+            <div class="sfp-body" style="padding:0 20px;gap:12px;">
+              <div class="skill-card">
+                <div class="skill-card-icon">
+                  <img src="./figma-assets/53092936-2e60-4cc2-bbf0-1caafd87d810.png" alt="" />
+                </div>
+                <div class="skill-card-info">
+                  <div class="skill-card-title">产品方案梳理</div>
+                  <div class="skill-card-desc">在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问…</div>
+                </div>
+              </div>
+              <div class="skill-card">
+                <div class="skill-card-icon">
+                  <img src="./figma-assets/53092936-2e60-4cc2-bbf0-1caafd87d810.png" alt="" />
+                </div>
+                <div class="skill-card-info">
+                  <div class="skill-card-title">产品方案梳理</div>
+                  <div class="skill-card-desc">在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问…</div>
+                </div>
+              </div>
+              <div class="skill-card">
+                <div class="skill-card-icon">
+                  <img src="./figma-assets/53092936-2e60-4cc2-bbf0-1caafd87d810.png" alt="" />
+                </div>
+                <div class="skill-card-info">
+                  <div class="skill-card-title">产品方案梳理</div>
+                  <div class="skill-card-desc">在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问…</div>
+                </div>
+              </div>
+              <div class="skill-card">
+                <div class="skill-card-icon">
+                  <img src="./figma-assets/53092936-2e60-4cc2-bbf0-1caafd87d810.png" alt="" />
+                </div>
+                <div class="skill-card-info">
+                  <div class="skill-card-title">产品方案梳理</div>
+                  <div class="skill-card-desc">在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问…</div>
+                </div>
+              </div>
+              <div class="skill-card is-added">
+                <div class="skill-card-icon">
+                  <img src="./figma-assets/53092936-2e60-4cc2-bbf0-1caafd87d810.png" alt="" />
+                </div>
+                <div class="skill-card-info">
+                  <div class="skill-card-title-row">
+                    <span class="skill-card-title">产品方案梳理</span>
+                    <div class="skill-card-added-badge">
+                      <img src="./figma-assets/9f63446b-805d-4147-993d-991d526d5117.svg" alt="" style="width:12px;height:12px;" />
+                      <span>已添加</span>
+                    </div>
+                  </div>
+                  <div class="skill-card-desc">在开发具体功能前梳理用户意图、需求与设计方案，通过分步提问…</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </main>
+
+    <script src="./script.js?v=60"></script>
+  </body>
+</html>
