@@ -758,6 +758,16 @@ function navigateTo(page, pushHistory = true) {
 }
 
 function renderPage(page) {
+  const flowPages = {
+    'claw-home': 'home',
+    'claw-loading': 'loading',
+    'claw-config': 'config',
+  };
+  if (flowPages[page]) {
+    setClawFlowPage(flowPages[page]);
+    return;
+  }
+
   const welcomePanel = document.getElementById('welcome-panel');
   const thread = document.getElementById('conversation-thread');
   const skillsMarket = document.getElementById('skills-market-page');
@@ -765,6 +775,7 @@ function renderPage(page) {
   const composer = document.getElementById('composer-form');
   const topTip = document.querySelector('.top-tip');
   const mainStage = document.querySelector('.main-stage');
+  setClawFlowInactive();
 
   if (page === 'welcome') {
     welcomePanel.style.display = 'flex';
@@ -826,11 +837,16 @@ document.getElementById('nav-forward')?.addEventListener('click', () => {
 
 // Home tab — always go back to welcome
 document.getElementById('tab-home')?.addEventListener('click', () => {
-  navigateTo('welcome');
+  navigateTo('claw-home');
 });
 
 // Claw tab — go to conversation if one exists, else welcome
 document.getElementById('tab-claw')?.addEventListener('click', () => {
+  const flowEl = document.getElementById('claw-flow');
+  if (flowEl?.dataset.page === 'loading' || flowEl?.dataset.page === 'config') {
+    navigateTo('claw-config');
+    return;
+  }
   if (conversationStarted) {
     navigateTo('conversation');
   }
@@ -2033,6 +2049,11 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && mentionPopoverOpen) {
     e.preventDefault();
     closeMentionPopover();
+  }
+  const clawSkillModal = document.getElementById('claw-skill-detail-modal');
+  if (e.key === 'Escape' && clawSkillModal && !clawSkillModal.hidden) {
+    e.preventDefault();
+    closeClawSkillDetail();
   }
 });
 
@@ -4058,3 +4079,1679 @@ function ensureStepDetailVisible(stepWrap, scrollContainer) {
     scrollContainer.scrollBy({ top: delta, behavior: 'smooth' });
   }
 }
+
+// ── 天禧 Claw 开箱流程 ────────────────────────────────
+
+const clawFlowEl = document.getElementById('claw-flow');
+const clawWindowFrame = document.querySelector('.window-frame');
+const clawLoadingBar = document.getElementById('claw-loading-bar');
+let clawLoadingTimer = null;
+let clawLoadingFrame = null;
+let clawExpertsAdded = false;
+let clawIntroAnimationStarted = false;
+
+const CLAW_EXPERTS = [
+  {
+    id: 'planner',
+    name: '学习规划师',
+    desc: '梳理学期节奏，规划每阶段的学习重心与优先级',
+    icon: './custom-assets/claw-flow/agent-1.png',
+  },
+  {
+    id: 'paper-reader',
+    name: '论文速读导师',
+    desc: '快速提炼论文核心论点与结构，省去逐字精读的时间',
+    icon: './custom-assets/claw-flow/agent-2.png',
+  },
+  {
+    id: 'material-master',
+    name: '资料整理大师',
+    desc: '课件、笔记、教材多源汇总，生成结构化知识清单',
+    icon: './custom-assets/claw-flow/agent-3.png',
+  },
+  {
+    id: 'exam-sprint',
+    name: '考前冲刺哥',
+    desc: '整合考点、梳理高频题型、生成冲刺复习计划',
+    icon: './custom-assets/claw-flow/agent-4.png',
+  },
+  {
+    id: 'language-tutor',
+    name: '外语一对一私教',
+    desc: '四六级专项突破，学术英文读写与口语表达陪练',
+    icon: './custom-assets/claw-flow/agent-5.png',
+  },
+  {
+    id: 'paper-hunter',
+    name: '论文猎手',
+    desc: '梳理论文脉络，快速定位可用观点与参考方向',
+    icon: './custom-assets/claw-flow/agent-6.png',
+  },
+  {
+    id: 'preview-officer',
+    name: '预习官',
+    desc: '课前生成预习卡片，提炼本节重点与预习问题',
+    icon: './custom-assets/claw-flow/agent-7.png',
+  },
+  {
+    id: 'goal-coach',
+    name: '目标拆解教练',
+    desc: '把大目标拆成可执行的小任务，带您一步步落地',
+    icon: './custom-assets/claw-flow/agent-8.png',
+  },
+];
+
+const clawSelectedExperts = new Set(CLAW_EXPERTS.slice(0, 4).map(item => item.id));
+let clawConfigSection = 'config';
+let activeExpertMarketItem = null;
+let expertToastTimer = null;
+let activeExpertMarketCategory = '一人公司';
+let activeTaskMenuId = null;
+let pendingDeleteTaskId = null;
+let selectedSubscriptionPlan = 'gold';
+
+let CLAW_TASK_ITEMS = [
+  {
+    id: 'stock-watch',
+    title: 'A股实时动态监控',
+    icon: '↻',
+    avatar: './custom-assets/claw-flow/task-avatar-1.svg',
+    enabled: true,
+    desc:
+      '每15分钟给我推送一下今天A股的实时动态。可以包括大盘异动及原因分析，领涨板块的情况等。可以重点关注科技、半导体、机器人板块。',
+    schedule: '每15分钟，上次执行: 今天16:15',
+    status: '成功',
+  },
+  {
+    id: 'mail-digest',
+    title: '每日邮件总结',
+    icon: '↻',
+    avatar: './custom-assets/claw-flow/task-avatar-2.svg',
+    enabled: true,
+    desc:
+      '每天18:00的时候，总结下我电脑里今天收到的邮件，主要是识别其中包含的重点信息，那些订阅的广告啊，验证码啊啥的都过滤掉。',
+    schedule: '每天18:00',
+    status: '',
+  },
+  {
+    id: 'tech-radar',
+    title: '科技热点雷达',
+    icon: '↻',
+    avatar: './custom-assets/claw-flow/task-avatar-3.svg',
+    enabled: false,
+    desc:
+      '每隔2小时，帮我扫一圈科技数码圈的热搜动态，平台只看微博热搜、抖音热榜、B站热门、知乎热榜。',
+    schedule: '每2小时，上次执行: 今天15:13',
+    status: '成功',
+  },
+  {
+    id: 'mentor-mail',
+    title: '给导师发项目进展邮件',
+    icon: '✓',
+    avatar: './custom-assets/claw-flow/task-avatar-4.svg',
+    enabled: true,
+    desc:
+      '明天（5月8号）早上10点，帮我发一封邮件给我的导师王教授，正文大致是项目进展说明，内容帮我优化得正式一些。',
+    schedule: '明天10:00',
+    status: '',
+  },
+];
+
+/** Claw 开箱内「技能广场」列表与详情（首行第三张为设计稿 ai-video-script 完整弹窗） */
+const CLAW_SKILL_PLAZA_ITEMS = [
+  {
+    id: 'plaza-1',
+    slug: 'strategy-advisor',
+    subtitle: '商业策略分析',
+    desc: '基于业务目标与市场环境，提供策略分析、竞争格局判断与增长路径建议，辅导关键决策。',
+    tags: ['需求分析', '战略规划', '决策支持'],
+    count: '638',
+    added: false,
+    icon: './custom-assets/claw-flow/skill-market/skill-figma-1.png',
+    detail: {
+      tags: ['需求分析', '战略规划', '商业分析'],
+      longDesc:
+        'strategy-advisor：根据业务目标与约束，把模糊问题拆成可验证的策略假设，并给出优先级与下一步行动建议。当你提到增长瓶颈、竞品差异、定位不清等场景时调用。',
+      meta: { author: 'Lenovo 技能团队', count: '638', source: '官方', updated: '2026.04.02' },
+      safeText: '已通过安全与合规验证，无恶意代码或数据泄露风险。',
+      howTo: [
+        {
+          title: '拆解策略问题',
+          desc: '输入业务目标、约束条件和当前卡点，快速拆成可验证的策略假设。',
+          copyText: '请帮我把当前业务问题拆成策略假设，并给出验证优先级。',
+        },
+        {
+          title: '判断竞争格局',
+          desc: '补充竞品、目标用户和市场环境，输出差异化机会与风险提醒。',
+          copyText: '请基于这些竞品信息分析竞争格局，并找出可突破的差异化机会。',
+        },
+      ],
+    },
+  },
+  {
+    id: 'plaza-2',
+    slug: 'markdown-new',
+    subtitle: '网页转 Markdown 工具',
+    desc: '将网页内容一键转换为结构清晰的 Markdown 格式，支持 AI 工作流处理与数据整理。',
+    tags: ['内容转换', 'Markdown处理', '数据整理'],
+    count: '728',
+    added: false,
+    icon: './custom-assets/claw-flow/skill-market/skill-figma-2.png',
+    detail: {
+      tags: ['内容转换', 'Markdown处理', '数据整理'],
+      longDesc:
+        'markdown-new：把网页内容转换为结构清晰、便于 AI 工作流继续处理的 Markdown 文档。',
+      meta: { author: 'Pingo 等', count: '1.2k', source: 'Github', updated: '2026.03.18' },
+      safeText: '已通过安全与合规验证，无恶意代码或数据泄露风险。',
+      howTo: [
+        {
+          title: '转换网页内容',
+          desc: '粘贴网页链接或正文内容，输出结构清晰、便于继续处理的 Markdown。',
+          copyText: '请把这个网页转换为结构清晰的 Markdown，并保留标题层级。',
+        },
+        {
+          title: '整理 AI 素材',
+          desc: '把网页中的段落、列表和关键数据整理成适合 AI 工作流引用的文本。',
+          copyText: '请提炼网页中的核心信息，并整理成可用于后续分析的 Markdown。',
+        },
+      ],
+    },
+  },
+  {
+    id: 'plaza-3',
+    slug: 'ai-video-script',
+    subtitle: 'AI视频脚本生成',
+    desc: '根据主题与关键词生成完整短视频脚本，覆盖分镜描述、画面提示与配音文案，并支持多平台时长与比例差异。',
+    tags: ['视频脚本', '分镜', '配音'],
+    count: '156',
+    added: true,
+    icon: './custom-assets/claw-flow/skill-market/skill-figma-9.png',
+    detail: {
+      tags: ['视频脚本生成', '分镜策划', 'AI绘画提示词', '配音文案撰写', '多平台短视频适配'],
+      longDesc:
+        'AI视频脚本生成器。根据用户输入的主题/关键词，分析生成完整的视频脚本，包含分镜描述、画面提示词、配音文案。适用于短视频创作者、AI视频制作者、内容营销人员。触发词:视频脚本、分镜、AI视频、短视频文案、视频策划。',
+      meta: { author: 'Pingo 等', count: '3.1k', source: 'Github', updated: '2026.04.10' },
+      safeText: '奇安信安全扫描通过，无恶意代码或数据泄露风险。',
+      howTo: [
+        {
+          title: '生成视频脚本',
+          desc: '一键生成包含结构、节奏与关键镜头的完整口播与分镜脚本。',
+          copyText: '请根据我的产品卖点生成一条 60 秒竖版短视频完整脚本，包含分镜与口播。',
+        },
+        {
+          title: '输出分镜与画面提示',
+          desc: '自动拆分镜头，输出每镜画面说明与可用于文生图/视频的提示词。',
+          copyText: '把上一版脚本按镜头拆分，并给每镜补充画面提示词（中文+英文关键词）。',
+        },
+        {
+          title: '撰写配音与文案',
+          desc: '为每个镜头生成自然口播与字幕文案，语气可指定轻松/专业/促销等。',
+          copyText: '用轻松语气重写口播，并输出配套字幕条（含时间轴建议）。',
+        },
+        {
+          title: '多平台视频适配',
+          desc: '针对抖音/B站/视频号等差异，调整节奏、信息密度与画面信息布局。',
+          copyText: '同一脚本请分别给出抖音 15s 快节奏版与 B 站 90s 讲解版的结构差异说明。',
+        },
+      ],
+    },
+  },
+  {
+    id: 'plaza-4',
+    slug: 'product-listing-generator',
+    subtitle: '电商商品文案生成',
+    desc: '自动生成电商平台商品标题、卖点文案与详情描述，支持多平台适配，提升上架效率。',
+    tags: ['电商运营', 'URL 内容'],
+    count: '1k',
+    added: false,
+    icon: './custom-assets/claw-flow/skill-market/skill-figma-4.png',
+    detail: {
+      tags: ['电商运营', 'URL 内容'],
+      longDesc:
+        'product-listing-generator：根据商品信息与目标平台要求，生成标题、卖点、详情描述和适配建议。',
+      meta: { author: '社区贡献', count: '2.9k', source: 'Github', updated: '2026.02.26' },
+      safeText: '已通过安全与合规验证，无恶意代码或数据泄露风险。',
+      howTo: [
+        {
+          title: '生成商品标题',
+          desc: '输入商品卖点、平台和目标人群，生成适配电商平台的高点击标题。',
+          copyText: '请根据这些商品卖点生成 5 个电商标题，并标注各自适合的平台。',
+        },
+        {
+          title: '撰写详情描述',
+          desc: '自动整理卖点、使用场景和参数信息，输出商品详情页文案。',
+          copyText: '请为这个商品生成详情页文案，包含卖点、场景和规格说明。',
+        },
+      ],
+    },
+  },
+  {
+    id: 'plaza-5',
+    slug: 'clawyer-onboarding',
+    subtitle: 'Clawver店铺搭建助手',
+    desc: '设置 Clawver 新店铺：注册代理、配置 Stripe 支付、自定义店面。用于创建商家入驻流程。',
+    tags: ['店铺搭建', '平台配置', '商家入驻'],
+    count: '1.5k',
+    added: false,
+    icon: './custom-assets/claw-flow/skill-market/skill-figma-5.png',
+    detail: {
+      tags: ['店铺搭建', '平台配置', '商家入驻'],
+      longDesc: 'clawyer-onboarding：辅助完成 Clawver 店铺注册、支付配置、店面初始化与入驻资料准备。',
+      meta: { author: 'DevTools Lab', count: '887', source: 'Github', updated: '2026.01.12' },
+      safeText: '已通过安全与合规验证，无恶意代码或数据泄露风险。',
+      howTo: [
+        {
+          title: '规划开店流程',
+          desc: '输入店铺类型、支付方式和目标市场，生成入驻与配置清单。',
+          copyText: '请帮我规划 Clawver 新店铺搭建流程，并列出每一步需要准备的资料。',
+        },
+      ],
+    },
+  },
+  {
+    id: 'plaza-6',
+    slug: 'linear',
+    subtitle: 'Linear任务管理助手',
+    desc: '与 Linear 集成进行问题跟踪。支持创建、更新、列出和搜索问题，查看分析与进度。',
+    tags: ['项目管理', 'Issue 管理'],
+    count: '622',
+    added: true,
+    icon: './custom-assets/claw-flow/skill-market/skill-figma-3.png',
+    detail: {
+      tags: ['项目管理', 'Issue 管理'],
+      longDesc: 'linear：连接 Linear 任务管理，支持问题创建、查询、更新、搜索与项目进展梳理。',
+      meta: { author: '官方', count: '2.1k', source: '官方', updated: '2026.03.30' },
+      safeText: '已通过安全与合规验证，无恶意代码或数据泄露风险。',
+      howTo: [
+        {
+          title: '创建任务问题',
+          desc: '描述需求或缺陷，自动生成 Linear Issue 的标题、描述和优先级建议。',
+          copyText: '请根据这段需求创建 Linear Issue 草稿，包含标题、描述、标签和优先级。',
+        },
+        {
+          title: '分析项目进度',
+          desc: '汇总问题状态和负责人信息，查看项目进度、阻塞点和风险。',
+          copyText: '请汇总当前 Linear 项目进度，并分析主要风险和下一步动作。',
+        },
+      ],
+    },
+  },
+  {
+    id: 'plaza-7',
+    slug: 'reddit-insights',
+    subtitle: 'Reddit舆情洞察分析工具',
+    desc: '通过 reddit-insights.com MCP 服务器进行语义 AI 搜索，分析 Reddit 内容与趋势。',
+    tags: ['舆情分析', '数据洞察', '趋势分析'],
+    count: '521',
+    added: false,
+    icon: './custom-assets/claw-flow/skill-market/skill-figma-7.png',
+    detail: {
+      tags: ['舆情分析', '数据洞察', '趋势分析'],
+      longDesc: 'reddit-insights：围绕关键词进行 Reddit 内容搜索、趋势归纳和舆情洞察。',
+      meta: { author: ' Lifestyle Kit ', count: '3.8k', source: '社区', updated: '2026.04.06' },
+      safeText: '已通过安全与合规验证，无恶意代码或数据泄露风险。',
+      howTo: [
+        {
+          title: '搜索舆情线索',
+          desc: '输入品牌、产品或关键词，检索 Reddit 讨论并归纳高频观点。',
+          copyText: '请围绕这个关键词搜索 Reddit 讨论，并总结主要用户观点。',
+        },
+        {
+          title: '分析趋势变化',
+          desc: '对比不同社区与时间段的讨论，判断用户关注点和潜在机会。',
+          copyText: '请分析这些 Reddit 讨论中的趋势变化和可行动机会。',
+        },
+      ],
+    },
+  },
+  {
+    id: 'plaza-8',
+    slug: 'robonet-workbench',
+    subtitle: '交易策略回测工具',
+    desc: '使用 RobonetMCP 服务器构建、回测、优化和部署交易策略。提供多种策略模板。',
+    tags: ['策略回测', '量化交易', '数据分析'],
+    count: '374',
+    added: false,
+    icon: './custom-assets/claw-flow/skill-market/skill-figma-8.png',
+    detail: {
+      tags: ['策略回测', '量化交易', '数据分析'],
+      longDesc: 'robonet-workbench：构建、回测、优化和部署交易策略，辅助量化研究与策略验证。',
+      meta: { author: 'Legal Helper', count: '1.5k', source: 'Github', updated: '2025.12.01' },
+      safeText: '已通过安全与合规验证，无恶意代码或数据泄露风险。',
+      howTo: [
+        {
+          title: '构建回测策略',
+          desc: '输入交易品种、指标和买卖规则，生成可回测的策略配置。',
+          copyText: '请根据这些交易规则生成一个可回测策略，并说明关键参数。',
+        },
+        {
+          title: '优化策略参数',
+          desc: '根据回测表现调整参数，比较收益、回撤和稳定性。',
+          copyText: '请分析这份回测结果，并给出参数优化建议。',
+        },
+        {
+          title: '生成风险报告',
+          desc: '汇总最大回撤、胜率、盈亏比等指标，输出策略风险提醒。',
+          copyText: '请基于回测数据生成一份策略风险报告。',
+        },
+      ],
+    },
+  },
+  {
+    id: 'plaza-9',
+    slug: 'zoho-recruit',
+    subtitle: '面试管理工具',
+    desc: 'Zoho Recruit API 集成（托管 OAuth），管理候选人、职位、面试与招聘流程。',
+    tags: ['OAuth集成', '候选人管理'],
+    count: '212',
+    added: false,
+    icon: './custom-assets/claw-flow/skill-market/skill-figma-6.png',
+    detail: {
+      tags: ['OAuth集成', '候选人管理'],
+      longDesc: 'zoho-recruit：对接 Zoho Recruit，管理候选人、职位、面试安排与招聘流程状态。',
+      meta: { author: 'Insight Lab', count: '2.4k', source: 'Github', updated: '2026.03.22' },
+      safeText: '已通过安全与合规验证，无恶意代码或数据泄露风险。',
+      howTo: [
+        {
+          title: '管理候选人',
+          desc: '输入候选人信息或岗位要求，快速创建、查询和更新招聘记录。',
+          copyText: '请帮我整理这些候选人信息，并生成面试跟进清单。',
+        },
+      ],
+    },
+  },
+  {
+    id: 'plaza-10',
+    slug: 'frontend-design-ui-generator',
+    subtitle: '前端生成工具',
+    desc: '使用 React、Tailwind CSS 和 shadcn/ui 构建独特生产级静态站点，适配页面与组件生成。',
+    tags: ['前端开发', '生成工具'],
+    count: '1.3k',
+    added: true,
+    icon: './custom-assets/claw-flow/skill-market/skill-figma-1.png',
+    detail: {
+      tags: ['前端开发', '生成工具'],
+      longDesc: 'frontend-design-ui-generator：根据页面需求生成现代前端界面，适合快速搭建静态页面和组件原型。',
+      meta: { author: '社区贡献', count: '1.3k', source: 'Github', updated: '2026.04.12' },
+      safeText: '已通过安全与合规验证，无恶意代码或数据泄露风险。',
+      howTo: [
+        {
+          title: '生成页面方案',
+          desc: '描述业务目标、页面内容和风格，输出前端页面结构与组件建议。',
+          copyText: '请根据这个产品需求生成一个生产级前端页面方案。',
+        },
+        {
+          title: '优化 UI 组件',
+          desc: '补充已有组件或截图，生成更贴合场景的样式和交互改进。',
+          copyText: '请基于这张页面截图优化 UI 组件层级和交互细节。',
+        },
+      ],
+    },
+  },
+  {
+    id: 'plaza-11',
+    slug: 'signnow',
+    subtitle: '电子签署集成工具',
+    desc: 'SignNowAPI 集成（托管 OAuth），电子签署平台，支持文档上传、发送签署与状态查询。',
+    tags: ['电子签署', 'API集成'],
+    count: '7.3k',
+    added: true,
+    icon: './custom-assets/claw-flow/skill-market/skill-figma-4.png',
+    detail: {
+      tags: ['电子签署', 'API集成'],
+      longDesc: 'signnow：对接 SignNow 电子签署能力，支持文档上传、签署发送、状态查询和流程跟踪。',
+      meta: { author: 'Pingo 等', count: '7.3k', source: 'Github', updated: '2026.04.18' },
+      safeText: '已通过安全与合规验证，无恶意代码或数据泄露风险。',
+      howTo: [
+        {
+          title: '发起签署流程',
+          desc: '上传文档并填写签署人信息，生成发送签署的操作建议。',
+          copyText: '请帮我创建电子签署流程，包含签署人、文件和通知文案。',
+        },
+        {
+          title: '查询签署状态',
+          desc: '根据文档或签署人信息，汇总签署进度和待处理事项。',
+          copyText: '请查询这些文档的签署状态，并列出仍需跟进的人。',
+        },
+      ],
+    },
+  },
+  {
+    id: 'plaza-12',
+    slug: 'tripo-3d-generation',
+    subtitle: '战略顾问',
+    desc: '通过文本或图像生成3D模型，支持创建色、物体、场景、游戏资产、电商展示。',
+    tags: ['3D生成', '模型创建'],
+    count: '7.3k',
+    added: false,
+    icon: './custom-assets/claw-flow/skill-market/skill-figma-10.png',
+    detail: {
+      tags: ['3D生成', '模型创建'],
+      longDesc: 'tripo-3d-generation：通过文本或图像生成 3D 模型，支持物体、场景、游戏资产和电商展示素材。',
+      meta: { author: 'Pingo 等', count: '7.3k', source: 'Github', updated: '2026.04.20' },
+      safeText: '已通过安全与合规验证，无恶意代码或数据泄露风险。',
+      howTo: [
+        {
+          title: '生成 3D 模型',
+          desc: '输入物体、风格和用途，生成可用于建模的文本或图片提示。',
+          copyText: '请根据这个产品描述生成 3D 模型提示词，适合电商展示。',
+        },
+        {
+          title: '优化模型细节',
+          desc: '补充材质、比例和场景信息，提升模型可用性与展示效果。',
+          copyText: '请优化这个 3D 模型提示词，补充材质、结构和场景细节。',
+        },
+      ],
+    },
+  },
+];
+
+function closeClawSkillDetail() {
+  const modal = document.getElementById('claw-skill-detail-modal');
+  if (!modal) return;
+  modal.hidden = true;
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function hideClawSkillSearchPopover() {
+  const popover = document.getElementById('claw-skill-search-popover');
+  if (!popover) return;
+  popover.hidden = true;
+  popover.innerHTML = '';
+}
+
+function openClawSkillDetail(skillId) {
+  const item = CLAW_SKILL_PLAZA_ITEMS.find(x => x.id === skillId);
+  const modal = document.getElementById('claw-skill-detail-modal');
+  if (!item || !modal) return;
+
+  hideClawSkillSearchPopover();
+  const d = item.detail;
+  document.getElementById('claw-skill-detail-icon').src = item.icon;
+  document.getElementById('claw-skill-detail-name').textContent = item.slug;
+  document.getElementById('claw-skill-detail-sub').textContent = item.subtitle;
+  document.getElementById('claw-skill-detail-longdesc').textContent = d.longDesc;
+
+  const tagsEl = document.getElementById('claw-skill-detail-tags');
+  tagsEl.innerHTML = d.tags.map(t => `<span class="skills-detail-tag">${escapeHtml(t)}</span>`).join('');
+
+  document.getElementById('claw-skill-detail-author').textContent = d.meta.author;
+  document.getElementById('claw-skill-detail-count').textContent = d.meta.count;
+  document.getElementById('claw-skill-detail-source').textContent = d.meta.source;
+  document.getElementById('claw-skill-detail-updated').textContent = d.meta.updated;
+  document.getElementById('claw-skill-detail-safe-text').textContent = d.safeText;
+
+  const howtoWrap = document.getElementById('claw-skill-detail-howto');
+  const howtoList = document.getElementById('claw-skill-detail-howto-list');
+  if (d.howTo && d.howTo.length) {
+    howtoWrap.hidden = false;
+    howtoList.innerHTML = d.howTo
+      .map(
+        row => `
+      <div class="claw-skill-howto-row">
+        <div class="claw-skill-howto-row-head">
+          <span class="claw-skill-howto-row-title">${escapeHtml(row.title)}</span>
+          <button type="button" class="claw-skill-howto-copy" aria-label="复制示例提示">
+            <span class="claw-skill-howto-copy-icon" aria-hidden="true"></span>
+          </button>
+        </div>
+        <p class="claw-skill-howto-row-desc">${escapeHtml(row.desc)}</p>
+      </div>`
+      )
+      .join('');
+    howtoList.querySelectorAll('.claw-skill-howto-copy').forEach((btn, i) => {
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        const row = d.howTo[i];
+        const text = row ? row.copyText || row.desc || '' : '';
+        navigator.clipboard?.writeText(text).catch(() => {});
+      });
+    });
+  } else {
+    howtoWrap.hidden = true;
+    howtoList.innerHTML = '';
+  }
+
+  modal.hidden = false;
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function bindClawSkillCategoryTabs() {
+  const tabs = document.getElementById('claw-skill-category-tabs');
+  if (!tabs || tabs.dataset.bound === 'true') return;
+  tabs.dataset.bound = 'true';
+  tabs.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabs.querySelectorAll('button').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+    });
+  });
+}
+
+function getClawSkillSearchText(item) {
+  const detail = item.detail || {};
+  return [
+    item.slug,
+    item.subtitle,
+    item.desc,
+    detail.longDesc,
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+function getClawSkillSearchMatches(query) {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  return CLAW_SKILL_PLAZA_ITEMS.filter(item => getClawSkillSearchText(item).toLowerCase().includes(q));
+}
+
+function escapeRegExp(str) {
+  return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function highlightClawSkillMatch(text, query) {
+  const safe = escapeHtml(text || '');
+  const q = query.trim();
+  if (!q) return safe;
+  return safe.replace(new RegExp(escapeRegExp(escapeHtml(q)), 'gi'), match => `<mark>${match}</mark>`);
+}
+
+function getClawSkillVisibleSnippet(item, query) {
+  const q = query.trim().toLowerCase();
+  const fields = [item.desc, item.detail?.longDesc, item.subtitle, item.slug].filter(Boolean);
+  return fields.find(text => text.toLowerCase().includes(q)) || item.detail?.longDesc || item.desc || '';
+}
+
+function renderClawSkillCards(items, emptyText = '暂无匹配技能') {
+  const grid = document.getElementById('claw-skill-card-grid');
+  if (!grid) return;
+
+  if (!items.length) {
+    grid.innerHTML = `<div class="claw-skill-empty">${escapeHtml(emptyText)}</div>`;
+    return;
+  }
+
+  grid.innerHTML = items.map(item => {
+    const blob = getClawSkillSearchText(item).replace(/"/g, '&quot;');
+    const badge = item.added
+      ? `<span class="claw-skill-plaza-badge"><img src="./icon/成功.svg" alt="" />已添加</span>`
+      : '';
+    return `
+      <button class="claw-skill-plaza-card" type="button" data-skill-id="${item.id}" data-search-blob="${blob}">
+        <div class="claw-skill-plaza-top">
+          <img class="claw-skill-plaza-icon" src="${item.icon}" alt="" />
+          <div class="claw-skill-plaza-titles">
+            <span class="claw-skill-plaza-slug">${escapeHtml(item.slug)}</span>
+            <span class="claw-skill-plaza-sub">${escapeHtml(item.subtitle)}</span>
+          </div>
+        </div>
+        <div class="claw-skill-plaza-body">
+          <p class="claw-skill-plaza-desc">${escapeHtml(item.desc)}</p>
+          <div class="claw-skill-plaza-tags">
+            ${item.tags.map(t => `<span class="claw-skill-plaza-tag">${escapeHtml(t)}</span>`).join('')}
+          </div>
+        </div>
+        <div class="claw-skill-plaza-foot">
+          <span class="claw-skill-plaza-count">${escapeHtml(item.count)} 添加</span>
+          ${badge}
+        </div>
+      </button>`;
+  }).join('');
+
+  grid.querySelectorAll('.claw-skill-plaza-card').forEach(btn => {
+    btn.addEventListener('click', () => openClawSkillDetail(btn.dataset.skillId));
+  });
+}
+
+function renderClawSkillSearchPopover(input) {
+  const popover = document.getElementById('claw-skill-search-popover');
+  const query = input.value.trim();
+  const matches = getClawSkillSearchMatches(query);
+  if (!popover || !query || !matches.length) {
+    hideClawSkillSearchPopover();
+    return;
+  }
+
+  popover.innerHTML = matches.map(item => `
+    <button class="claw-skill-search-option" type="button" data-skill-id="${item.id}">
+      <div class="claw-skill-search-option-top">
+        <img class="claw-skill-search-option-icon" src="${item.icon}" alt="" />
+        <div class="claw-skill-search-option-text">
+          <span class="claw-skill-search-option-title">${highlightClawSkillMatch(item.slug, query)}</span>
+          <p class="claw-skill-search-option-sub">${highlightClawSkillMatch(item.subtitle, query)}</p>
+        </div>
+      </div>
+      <p class="claw-skill-search-option-desc">${highlightClawSkillMatch(getClawSkillVisibleSnippet(item, query), query)}</p>
+    </button>
+  `).join('');
+  popover.hidden = false;
+  popover.querySelectorAll('.claw-skill-search-option').forEach(option => {
+    option.addEventListener('mousedown', e => e.preventDefault());
+    option.addEventListener('click', () => openClawSkillDetail(option.dataset.skillId));
+  });
+}
+
+function setClawSkillSearchResults(query) {
+  const main = document.getElementById('claw-skill-market-main');
+  const matches = getClawSkillSearchMatches(query);
+  hideClawSkillSearchPopover();
+  main?.classList.add('is-search-results');
+  renderClawSkillCards(matches, '没有找到匹配的技能');
+  document.querySelector('.claw-skill-market-scroll')?.scrollTo({ top: 0 });
+}
+
+function resetClawSkillSearchResults() {
+  const main = document.getElementById('claw-skill-market-main');
+  main?.classList.remove('is-search-results');
+  renderClawSkillCards(CLAW_SKILL_PLAZA_ITEMS);
+}
+
+function bindClawSkillMarketSearch() {
+  const search = document.querySelector('#claw-skill-market-main .claw-skill-market-search');
+  const wrap = document.querySelector('#claw-skill-market-main .claw-skill-search-wrap');
+  const input = search?.querySelector('input');
+  const clearBtn = search?.querySelector('.claw-skill-market-search-clear');
+  if (!search || !wrap || !input || input.dataset.bound === 'true') return;
+  input.dataset.bound = 'true';
+
+  const updateState = () => {
+    const hasValue = Boolean(input.value.trim());
+    search.classList.toggle('is-filled', hasValue);
+    search.classList.toggle('is-active', document.activeElement === input || hasValue);
+  };
+
+  input.addEventListener('focus', () => {
+    updateState();
+    renderClawSkillSearchPopover(input);
+  });
+  input.addEventListener('input', () => {
+    updateState();
+    if (!input.value.trim()) resetClawSkillSearchResults();
+    renderClawSkillSearchPopover(input);
+  });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const query = input.value.trim();
+      if (query) setClawSkillSearchResults(query);
+      else resetClawSkillSearchResults();
+    }
+    if (e.key === 'Escape') hideClawSkillSearchPopover();
+  });
+  input.addEventListener('blur', updateState);
+
+  clearBtn?.addEventListener('mousedown', e => e.preventDefault());
+  clearBtn?.addEventListener('click', () => {
+    input.value = '';
+    updateState();
+    hideClawSkillSearchPopover();
+    resetClawSkillSearchResults();
+    input.focus();
+  });
+
+  document.addEventListener('mousedown', e => {
+    if (!wrap.contains(e.target)) hideClawSkillSearchPopover();
+  });
+  updateState();
+}
+
+function renderClawSkillPlaza() {
+  const main = document.getElementById('claw-skill-market-main');
+  main?.classList.remove('is-search-results');
+  renderClawSkillCards(CLAW_SKILL_PLAZA_ITEMS);
+  bindClawSkillCategoryTabs();
+  bindClawSkillMarketSort();
+  bindClawSkillMarketSearch();
+}
+
+function bindClawSkillMarketSort() {
+  const sort = document.querySelector('#claw-skill-market-main .claw-skill-sort');
+  if (!sort || sort.dataset.bound === 'true') return;
+  sort.dataset.bound = 'true';
+  sort.querySelectorAll('.claw-skill-sort-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      sort.querySelectorAll('.claw-skill-sort-btn').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+    });
+  });
+}
+
+function clawAgentIcon(name, fallbackIndex = 0) {
+  return CLAW_EXPERTS.find(item => item.name === name)?.icon || CLAW_EXPERTS[fallbackIndex % CLAW_EXPERTS.length].icon;
+}
+
+const EXPERT_MARKET_TEAMS = [
+  {
+    id: 'exam',
+    title: '考前突击小队',
+    icon: '⚡',
+    tone: 'cold',
+    category: '一人公司',
+    added: false,
+    experts: [
+      { name: '考前冲刺哥', desc: '整合考点、梳理高频题型、生成冲刺复习计划', icon: clawAgentIcon('考前冲刺哥', 3) },
+      { name: 'AI论文速读导师', desc: '梳理学期节奏，规划每阶段的学习重心与优先级', icon: clawAgentIcon('论文速读导师', 1) },
+      { name: '深夜解压大师', desc: '深夜陪伴：情绪疏导与倾听助眠', icon: clawAgentIcon('学习规划师', 0) },
+      { name: '资料整理大师', desc: '课件、笔记、教材多源汇总，生成结构化知识清单', icon: clawAgentIcon('资料整理大师', 2) },
+    ],
+  },
+  {
+    id: 'study',
+    title: '学业规划小队',
+    icon: '🎨',
+    tone: 'warm',
+    category: '学术教育',
+    added: false,
+    experts: [
+      { name: '学习规划师', desc: '量身定制每日学习计划，跟着走就行', icon: clawAgentIcon('学习规划师', 0) },
+      { name: '目标拆解教练', desc: '多国申请+选校定位+文书指导，圆梦名校', icon: clawAgentIcon('目标拆解教练', 7) },
+      { name: '留学规划顾问', desc: '多国申请+选校定位+文书指导，圆梦名校', icon: clawAgentIcon('论文猎手', 5) },
+      { name: '高考志愿填报顾问', desc: '院校匹配+专业推荐+分数线预测，不浪费分', icon: clawAgentIcon('学习规划师', 0) },
+    ],
+  },
+  {
+    id: 'cross-border',
+    title: '跨境电商团队',
+    icon: '💰',
+    tone: 'gold',
+    category: '一人公司',
+    added: false,
+    experts: [
+      {
+        name: '跨境电商情报探长',
+        desc: '7x24h全网热搜雷达，只推送你领域相关的精准选品',
+        icon: clawAgentIcon('学习规划师', 0),
+        detail:
+          '我是竞品雷达，一只24小时不眨眼的跨境电商情报探长。盯着竞品的价格、Listing、评论和上新的每一个风吹草动，是我的本能。数据就是我的眼睛，异常就是我的猎物。价格变动超5%日报汇总，超15%即时告警；差评暴增秒级响应；Listing改动每日对比。只做合规数据采集，情报归情报，决策归你。',
+        skills: ['online-search', 'competitor-monitoring', 'price-tracker', 'amazon-competitor-analyzer'],
+      },
+      { name: 'TikTok策略师', desc: '病毒式内容+算法优化，全球流量把抓', icon: clawAgentIcon('论文速读导师', 1) },
+      { name: '库存预测专家', desc: '需求预测+安全库存+大促备货，精准管库存', icon: clawAgentIcon('资料整理大师', 2) },
+      { name: 'PPC竞价策略师', desc: '关键词+出价+质量分优化，最大化广告ROI', icon: clawAgentIcon('论文猎手', 5) },
+    ],
+  },
+  {
+    id: 'dev',
+    title: '软件开发工作室',
+    icon: '💻',
+    tone: 'green',
+    category: '技术工程',
+    added: false,
+    experts: [
+      { name: '产品经理', desc: 'PRD+路线图+产品全生命周期，从0到1交付', icon: clawAgentIcon('考前冲刺哥', 3) },
+      { name: 'UI设计师', desc: '设计系统+组件库，高质量界面快速生成', icon: clawAgentIcon('学习规划师', 0) },
+      { name: '前端开发者', desc: '精通主流前端技术栈，帮你实现高质量界面', icon: clawAgentIcon('目标拆解教练', 7) },
+      { name: '后端架构师', desc: '微服务+分布式+高可用，后端架构全局把控', icon: clawAgentIcon('外语一对一私教', 4) },
+    ],
+  },
+  {
+    id: 'stock',
+    title: '股市行情分析所',
+    icon: '📊',
+    tone: 'blue',
+    category: '金融',
+    added: false,
+    experts: [
+      { name: 'A股行情追踪专家', desc: '7x24小时盯盘，异动第一时间送达', icon: clawAgentIcon('论文速读导师', 1) },
+      { name: '宏观经济专家', desc: '利率变了？政策又吹了？我帮你拆明白', icon: clawAgentIcon('考前冲刺哥', 3) },
+      { name: '基金掘金师', desc: '3000+只基金我帮你翻，只挑真正能拿住的', icon: clawAgentIcon('资料整理大师', 2) },
+      { name: '个股诊断专家', desc: '深度扫描，看透每只股的价值与风险', icon: clawAgentIcon('目标拆解教练', 7) },
+    ],
+  },
+  {
+    id: 'media',
+    title: '全平台自媒体公司',
+    icon: '📣',
+    tone: 'purple',
+    category: '营销增长',
+    added: false,
+    experts: [
+      { name: '自媒体热点猎手', desc: '7x24h全网热搜雷达，只推送你领域相关的精准选题弹药', icon: clawAgentIcon('学习规划师', 0) },
+      { name: '抖音运营策略师', desc: '让视频上热榜不靠玄学', icon: clawAgentIcon('论文猎手', 5) },
+      { name: '小红书爆款操盘手', desc: '从选题到爆款全流程服务，你负责拍我负责火', icon: clawAgentIcon('预习官', 6) },
+      { name: '公众号内容助手', desc: '给主题即出稿，策划到排版一步到位', icon: clawAgentIcon('外语一对一私教', 4) },
+    ],
+  },
+];
+
+function setClawFlowInactive() {
+  clawWindowFrame?.classList.remove('claw-flow-active', 'claw-flow-home', 'claw-flow-loading', 'claw-flow-config');
+  clawFlowEl?.removeAttribute('data-page');
+}
+
+function syncClawTabs(page) {
+  const homeTab = document.getElementById('tab-home');
+  const clawTab = document.getElementById('tab-claw');
+  homeTab?.classList.toggle('is-active', page === 'home');
+  clawTab?.classList.toggle('is-active', page !== 'home');
+}
+
+function setClawFlowPage(page) {
+  if (!clawFlowEl || !clawWindowFrame) return;
+  clawWindowFrame.classList.add('claw-flow-active');
+  clawWindowFrame.classList.toggle('claw-flow-home', page === 'home');
+  clawWindowFrame.classList.toggle('claw-flow-loading', page === 'loading');
+  clawWindowFrame.classList.toggle('claw-flow-config', page === 'config');
+  clawFlowEl.dataset.page = page;
+  syncClawTabs(page);
+
+  if (page !== 'loading') {
+    stopClawLoadingAnimation();
+  }
+  if (page === 'loading') {
+    startClawLoadingAnimation();
+  }
+  if (page === 'config') {
+    setClawConfigSection(clawConfigSection);
+    renderClawExpertCards();
+    document.querySelector('.claw-dialog-scroll')?.scrollTo({ top: 0 });
+    if (clawConfigSection === 'config') requestAnimationFrame(startClawIntroAnimation);
+  }
+}
+
+function setClawConfigSection(section) {
+  const allowed = new Set(['config', 'xiaotian', 'expert-market', 'skill', 'task', 'subscription']);
+  clawConfigSection = allowed.has(section) ? section : 'config';
+  const configPage = document.getElementById('claw-config-page');
+  const configMain = document.querySelector('#claw-config-page .claw-config-main');
+  const xiaotianMain = document.getElementById('claw-xiaotian-main');
+  const marketMain = document.getElementById('claw-expert-market-main');
+  const skillMain = document.getElementById('claw-skill-market-main');
+  const taskMain = document.getElementById('claw-task-center-main');
+  const subscriptionMain = document.getElementById('claw-subscription-main');
+
+  configPage?.classList.toggle('is-xiaotian-page', clawConfigSection === 'xiaotian');
+  configPage?.classList.toggle('is-expert-market', clawConfigSection === 'expert-market');
+  configPage?.classList.toggle('is-skill-market', clawConfigSection === 'skill');
+  configPage?.classList.toggle('is-task-center', clawConfigSection === 'task');
+  configPage?.classList.toggle('is-subscription-page', clawConfigSection === 'subscription');
+
+  if (configMain) configMain.hidden = clawConfigSection !== 'config';
+  if (xiaotianMain) xiaotianMain.hidden = clawConfigSection !== 'xiaotian';
+  if (marketMain) marketMain.hidden = clawConfigSection !== 'expert-market';
+  if (skillMain) skillMain.hidden = clawConfigSection !== 'skill';
+  if (taskMain) taskMain.hidden = clawConfigSection !== 'task';
+  if (subscriptionMain) subscriptionMain.hidden = clawConfigSection !== 'subscription';
+
+  document.querySelectorAll('.claw-config-sidebar [data-claw-section]').forEach(item => {
+    item.classList.toggle('is-active', item.dataset.clawSection === clawConfigSection);
+  });
+
+  closeClawSkillDetail();
+  closeExpertDetail();
+  closeTaskDeleteModal();
+  activeTaskMenuId = null;
+
+  if (clawConfigSection === 'expert-market') {
+    renderExpertMarket();
+    document.querySelector('.expert-market-scroll')?.scrollTo({ top: 0 });
+  }
+
+  if (clawConfigSection === 'skill') {
+    renderClawSkillPlaza();
+    document.querySelector('.claw-skill-market-scroll')?.scrollTo({ top: 0 });
+  }
+
+  if (clawConfigSection === 'task') {
+    renderClawTaskCenter();
+    document.querySelector('.claw-task-center-scroll')?.scrollTo({ top: 0 });
+  }
+
+  if (clawConfigSection === 'subscription') {
+    syncSubscriptionPlans();
+  }
+}
+
+function stopClawLoadingAnimation() {
+  if (clawLoadingTimer) {
+    clearTimeout(clawLoadingTimer);
+    clawLoadingTimer = null;
+  }
+  if (clawLoadingFrame) {
+    cancelAnimationFrame(clawLoadingFrame);
+    clawLoadingFrame = null;
+  }
+}
+
+function startClawLoadingAnimation() {
+  stopClawLoadingAnimation();
+  const duration = 2000;
+  const startedAt = performance.now();
+  if (clawLoadingBar) clawLoadingBar.style.width = '0%';
+
+  const tick = now => {
+    const progress = Math.min(1, (now - startedAt) / duration);
+    if (clawLoadingBar) clawLoadingBar.style.width = `${Math.round(progress * 100)}%`;
+    if (progress < 1) {
+      clawLoadingFrame = requestAnimationFrame(tick);
+    }
+  };
+  clawLoadingFrame = requestAnimationFrame(tick);
+  clawLoadingTimer = setTimeout(() => {
+    clawIntroAnimationStarted = false;
+    navigateTo('claw-config');
+  }, duration);
+}
+
+function startClawEntryFlow() {
+  clawIntroAnimationStarted = false;
+  clawConfigSection = 'config';
+  navigateTo('claw-loading');
+}
+
+function renderClawExpertCards() {
+  const grid = document.getElementById('agent-select-grid');
+  if (!grid || grid.dataset.rendered === 'true') {
+    updateClawSelectionUI();
+    return;
+  }
+
+  grid.innerHTML = CLAW_EXPERTS.map(item => `
+    <button class="agent-card-option" type="button" data-agent-id="${item.id}" aria-pressed="false">
+      <img src="${item.icon}" alt="" />
+      <span>
+        <strong>${escapeHtml(item.name)}</strong>
+        <small>${escapeHtml(item.desc)}</small>
+      </span>
+      <span class="agent-card-check" aria-hidden="true"></span>
+    </button>
+  `).join('');
+  grid.dataset.rendered = 'true';
+
+  grid.querySelectorAll('.agent-card-option').forEach(card => {
+    card.addEventListener('click', () => {
+      if (clawExpertsAdded) return;
+      const id = card.dataset.agentId;
+      if (!id) return;
+      if (clawSelectedExperts.has(id)) clawSelectedExperts.delete(id);
+      else clawSelectedExperts.add(id);
+      updateClawSelectionUI();
+    });
+  });
+
+  updateClawSelectionUI();
+}
+
+function updateClawSelectionUI() {
+  const total = CLAW_EXPERTS.length;
+  const count = clawSelectedExperts.size;
+  document.getElementById('claw-config-page')?.classList.toggle('claw-experts-added', clawExpertsAdded);
+  document.querySelectorAll('.agent-card-option[data-agent-id]').forEach(card => {
+    const selected = clawSelectedExperts.has(card.dataset.agentId);
+    card.classList.toggle('is-selected', selected);
+    card.setAttribute('aria-pressed', selected ? 'true' : 'false');
+  });
+
+  const countEl = document.getElementById('agent-selected-count');
+  if (countEl) countEl.textContent = `已选 ${count}/${total} 位专家`;
+
+  const selectAll = document.getElementById('agent-select-all');
+  if (selectAll) {
+    selectAll.classList.toggle('is-checked', count === total);
+    selectAll.classList.toggle('is-mixed', count > 0 && count < total);
+    selectAll.setAttribute('aria-checked', count === total ? 'true' : count === 0 ? 'false' : 'mixed');
+  }
+
+  const addBtn = document.getElementById('agent-add-button');
+  if (addBtn) {
+    addBtn.textContent = clawExpertsAdded ? '已添加' : '一键添加';
+    addBtn.classList.toggle('is-enabled', count > 0 && !clawExpertsAdded);
+    addBtn.classList.toggle('is-added', clawExpertsAdded);
+    addBtn.disabled = clawExpertsAdded || count === 0;
+  }
+
+  renderClawAddedAgentList();
+}
+
+function getAddedClawSidebarAgents() {
+  const byName = new Map();
+  if (clawExpertsAdded) {
+    CLAW_EXPERTS.forEach(item => {
+      if (clawSelectedExperts.has(item.id)) byName.set(item.name, item);
+    });
+  }
+  EXPERT_MARKET_TEAMS.forEach(team => {
+    team.experts.forEach(expert => {
+      if (expert.added) byName.set(expert.name, expert);
+    });
+  });
+  return [...byName.values()];
+}
+
+function renderClawAddedAgentList() {
+  const list = document.getElementById('claw-added-agent-list');
+  if (!list) return;
+  const agents = getAddedClawSidebarAgents();
+  document.querySelector('.claw-config-sidebar')?.classList.toggle('has-added-agents', agents.length > 0);
+  list.innerHTML = agents
+    .map(agent => `
+      <button class="claw-added-agent-item" type="button" data-agent-name="${escapeHtml(agent.name)}">
+        <img src="${agent.icon}" alt="" />
+        <span>
+          <strong>${escapeHtml(agent.name)}</strong>
+          <small>${escapeHtml(agent.desc)}</small>
+        </span>
+      </button>
+    `)
+    .join('');
+  list.querySelectorAll('.claw-added-agent-item').forEach(button => {
+    button.addEventListener('click', () => {
+      const found = findMarketExpertByName(button.dataset.agentName);
+      if (found) openExpertDetail(found.team.id, found.expert.name);
+    });
+  });
+}
+
+function scrollClawDialogToBottom() {
+  const scroll = document.querySelector('.claw-dialog-scroll');
+  if (scroll) scroll.scrollTo({ top: scroll.scrollHeight, behavior: 'smooth' });
+}
+
+function typeClawText(el, text, options = {}) {
+  const content = String(text || '');
+  const speed = options.speed ?? 5;
+  const step = Math.max(1, options.step ?? 1);
+  const shouldScroll = options.autoScroll !== false;
+  el.classList.add('typewriter-text', 'is-typing');
+  el.textContent = '';
+
+  return new Promise(resolve => {
+    if (!content) {
+      el.classList.remove('is-typing');
+      resolve(el);
+      return;
+    }
+
+    let index = 0;
+    const tick = () => {
+      index = Math.min(content.length, index + step);
+      el.textContent = content.slice(0, index);
+      if (shouldScroll) scrollClawDialogToBottom();
+      if (index >= content.length) {
+        el.textContent = content;
+        el.classList.remove('is-typing');
+        resolve(el);
+        return;
+      }
+      setTimeout(tick, getTypewriterDelay(content[index - 1], speed));
+    };
+    requestAnimationFrame(tick);
+  });
+}
+
+function startClawIntroAnimation(options = {}) {
+  const article = document.querySelector('#claw-config-page .claw-dialog');
+  const force = Boolean(options.force);
+  if (!article) return;
+  if (clawExpertsAdded || (clawIntroAnimationStarted && !force)) {
+    article.classList.remove('is-intro-pending-root');
+    return;
+  }
+  clawIntroAnimationStarted = true;
+
+  const paragraphs = [...article.querySelectorAll(':scope > p')];
+  const leadParagraphs = paragraphs.slice(0, 5);
+  const closingParagraph = paragraphs[5];
+  const cards = [...article.querySelectorAll('.agent-card-option')];
+  const selectionBar = article.querySelector('.agent-selection-bar');
+  const stored = new Map();
+
+  [...leadParagraphs, closingParagraph].filter(Boolean).forEach(el => {
+    stored.set(el, el.textContent || '');
+    el.textContent = '';
+  });
+
+  cards.forEach(card => {
+    card.classList.add('is-intro-pending');
+    const title = card.querySelector('strong');
+    const desc = card.querySelector('small');
+    if (title) {
+      stored.set(title, title.textContent || '');
+      title.textContent = '';
+    }
+    if (desc) {
+      stored.set(desc, desc.textContent || '');
+      desc.textContent = '';
+    }
+  });
+  selectionBar?.classList.add('is-intro-pending');
+  article.classList.remove('is-intro-pending-root');
+
+  let sequence = Promise.resolve();
+  leadParagraphs.forEach(paragraph => {
+    sequence = sequence.then(() => typeClawText(paragraph, stored.get(paragraph), { speed: 4, step: 1, autoScroll: false }));
+  });
+
+  sequence = sequence.then(async () => {
+    for (const card of cards) {
+      card.classList.remove('is-intro-pending');
+      const title = card.querySelector('strong');
+      const desc = card.querySelector('small');
+      if (title) await typeClawText(title, stored.get(title), { speed: 4, step: 1, autoScroll: false });
+      if (desc) await typeClawText(desc, stored.get(desc), { speed: 4, step: 1, autoScroll: false });
+    }
+    selectionBar?.classList.remove('is-intro-pending');
+  });
+
+  if (closingParagraph) {
+    sequence = sequence.then(() => typeClawText(closingParagraph, stored.get(closingParagraph), { speed: 4, step: 1, autoScroll: false }));
+  }
+
+  sequence.finally(() => {
+    selectionBar?.classList.remove('is-intro-pending');
+    article.classList.remove('is-intro-pending-root');
+  });
+}
+
+function getClawSelectedExpertNames() {
+  return CLAW_EXPERTS
+    .filter(item => clawSelectedExperts.has(item.id))
+    .map(item => item.name);
+}
+
+function createClawUserBubble(text) {
+  const bubble = document.createElement('div');
+  bubble.className = 'claw-chat-user-bubble';
+  bubble.textContent = text;
+  return bubble;
+}
+
+function createClawAddedReply() {
+  const reply = document.createElement('div');
+  reply.className = 'claw-chat-ai-reply';
+  reply.innerHTML = `
+    <p class="claw-added-reply-text"></p>
+    <div class="claw-reply-actions" hidden>
+      <img src="./custom-assets/claw-flow/output-actions.svg" alt="更多建议、重新、搜索、复制、收藏、赞、踩" />
+    </div>
+    <div class="claw-followups" hidden>
+      <button type="button" data-followup="strengths"><span>这些团队的核心优势是什么？</span><i aria-hidden="true"></i></button>
+      <button type="button" data-followup="breakthroughs"><span>他们在未来有哪些关键突破点？</span><i aria-hidden="true"></i></button>
+      <button type="button" data-followup="score"><span>这些团队的综合得分是如何评价的？</span><i aria-hidden="true"></i></button>
+    </div>
+  `;
+  bindClawFollowups(reply);
+  return reply;
+}
+
+const CLAW_FOLLOWUP_REPLIES = {
+  strengths:
+    '这些团队的核心优势在于“分工明确 + 场景闭环”。学业规划小队负责把学习目标拆成每天可执行的节奏；考前突击小队擅长压缩复习路径、抓高频考点；跨境电商、软件开发、金融和自媒体团队则分别覆盖商业运营、产品交付、行情判断和内容增长。它们不是单个工具，而是一组能被连续调度的智能体组合。',
+  breakthroughs:
+    '未来最关键的突破点有三个：第一是让每个智能体记住你的长期偏好，比如学习节奏、常用资料和表达方式；第二是跨团队协同，例如产品经理拉起设计师和开发者一起推进一个任务；第三是把任务中心和提醒能力接起来，让智能体不只回答问题，也能按时间持续跟进。',
+  score:
+    '综合得分主要看四个维度：任务覆盖度、执行稳定性、结果可用性和协作效率。当前最适合高频使用的是学业规划小队、考前突击小队和软件开发工作室；跨境电商团队、股市行情分析所更适合明确目标后的专项任务；自媒体团队在选题、脚本和复盘链路上得分更高。',
+};
+
+function bindClawFollowups(scope) {
+  scope.querySelectorAll?.('.claw-followups button[data-followup]').forEach(button => {
+    button.addEventListener('click', () => handleClawFollowup(button.dataset.followup, button.innerText.trim()));
+  });
+}
+
+function handleClawFollowup(type, question) {
+  const article = document.querySelector('#claw-config-page .claw-dialog');
+  const response = CLAW_FOLLOWUP_REPLIES[type];
+  if (!article || !response) return;
+
+  article.appendChild(createClawUserBubble(question));
+  const reply = document.createElement('div');
+  reply.className = 'claw-chat-ai-reply';
+  reply.innerHTML = `<p class="claw-added-reply-text"></p>`;
+  article.appendChild(reply);
+  scrollClawDialogToBottom();
+  typeClawText(reply.querySelector('.claw-added-reply-text'), response, { speed: 4, step: 1 }).then(scrollClawDialogToBottom);
+}
+
+function renderClawTaskCenter() {
+  const grid = document.getElementById('claw-task-grid');
+  if (!grid) return;
+
+  grid.innerHTML = CLAW_TASK_ITEMS.map(task => `
+    <article class="claw-task-card" data-task-id="${escapeHtml(task.id)}">
+      <div class="claw-task-card-head">
+        <div class="claw-task-title">
+          <span class="claw-task-icon" style="--task-avatar: url('${escapeHtml(task.avatar)}')" aria-hidden="true"></span>
+          <span>${escapeHtml(task.title)}</span>
+        </div>
+        <button class="claw-task-switch${task.enabled ? ' is-on' : ''}" type="button" aria-label="${task.enabled ? '关闭' : '开启'}${escapeHtml(task.title)}" aria-pressed="${task.enabled ? 'true' : 'false'}"></button>
+      </div>
+      <p class="claw-task-desc">${escapeHtml(task.desc)}</p>
+      <div class="claw-task-divider"></div>
+      <div class="claw-task-card-foot">
+        <div class="claw-task-meta">
+          <span class="claw-task-clock" aria-hidden="true"></span>
+          <span>${escapeHtml(task.schedule)}</span>
+          ${task.status ? `<span class="claw-task-status">${escapeHtml(task.status)}</span>` : ''}
+        </div>
+        <button class="claw-task-more" type="button" aria-label="更多操作" aria-expanded="${activeTaskMenuId === task.id ? 'true' : 'false'}">...</button>
+      </div>
+      <div class="claw-task-menu" ${activeTaskMenuId === task.id ? '' : 'hidden'}>
+        <button class="claw-task-delete-option" type="button">
+          <span class="claw-task-delete-icon" aria-hidden="true"></span>
+          <span>删除</span>
+        </button>
+      </div>
+    </article>
+  `).join('');
+
+  grid.querySelectorAll('.claw-task-switch').forEach(button => {
+    button.addEventListener('click', event => {
+      event.stopPropagation();
+      const card = button.closest('.claw-task-card');
+      const task = CLAW_TASK_ITEMS.find(item => item.id === card?.dataset.taskId);
+      if (!task) return;
+      task.enabled = !task.enabled;
+      renderClawTaskCenter();
+    });
+  });
+
+  grid.querySelectorAll('.claw-task-more').forEach(button => {
+    button.addEventListener('click', event => {
+      event.stopPropagation();
+      const taskId = button.closest('.claw-task-card')?.dataset.taskId;
+      activeTaskMenuId = activeTaskMenuId === taskId ? null : taskId;
+      renderClawTaskCenter();
+    });
+  });
+
+  grid.querySelectorAll('.claw-task-delete-option').forEach(button => {
+    button.addEventListener('click', event => {
+      event.stopPropagation();
+      const taskId = button.closest('.claw-task-card')?.dataset.taskId;
+      openTaskDeleteModal(taskId);
+    });
+  });
+}
+
+function openTaskDeleteModal(taskId) {
+  const task = CLAW_TASK_ITEMS.find(item => item.id === taskId);
+  const modal = document.getElementById('claw-task-delete-modal');
+  const title = document.getElementById('claw-task-delete-title');
+  if (!task || !modal || !title) return;
+  pendingDeleteTaskId = task.id;
+  activeTaskMenuId = null;
+  title.textContent = `确认删除任务「${task.title}」吗？`;
+  modal.hidden = false;
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeTaskDeleteModal() {
+  const modal = document.getElementById('claw-task-delete-modal');
+  if (!modal) return;
+  modal.hidden = true;
+  modal.setAttribute('aria-hidden', 'true');
+  pendingDeleteTaskId = null;
+}
+
+function confirmTaskDelete() {
+  if (!pendingDeleteTaskId) return;
+  CLAW_TASK_ITEMS = CLAW_TASK_ITEMS.filter(task => task.id !== pendingDeleteTaskId);
+  closeTaskDeleteModal();
+  renderClawTaskCenter();
+}
+
+function syncSubscriptionPlans() {
+  if (selectedSubscriptionPlan === 'silver') selectedSubscriptionPlan = 'gold';
+  document.querySelectorAll('.claw-plan-card').forEach(card => {
+    const selected = card.dataset.plan !== 'silver' && card.dataset.plan === selectedSubscriptionPlan;
+    card.classList.toggle('is-selected', selected);
+    card.setAttribute('aria-pressed', selected ? 'true' : 'false');
+  });
+}
+
+function renderExpertMarket() {
+  const grid = document.getElementById('expert-team-grid');
+  if (!grid) return;
+  bindExpertMarketTabs();
+
+  const teams = activeExpertMarketCategory === '一人公司'
+    ? EXPERT_MARKET_TEAMS
+    : EXPERT_MARKET_TEAMS.filter(team => team.category === activeExpertMarketCategory);
+  grid.classList.toggle('is-agent-grid', activeExpertMarketCategory !== '一人公司');
+
+  if (activeExpertMarketCategory === '一人公司') {
+    grid.innerHTML = teams.map(team => {
+      const teamAdded = isMarketTeamFullyAdded(team);
+      team.added = teamAdded;
+      return `
+      <article class="expert-team-card expert-team-${team.tone}" data-team-id="${team.id}">
+        <header class="expert-team-head">
+          <h3><span>${team.icon}</span>${escapeHtml(team.title)}</h3>
+          <button class="expert-team-add${teamAdded ? ' is-added' : ''}" type="button" data-team-id="${team.id}" ${teamAdded ? 'disabled' : ''}>${teamAdded ? '已添加' : '一键添加'}</button>
+        </header>
+        <div class="expert-person-list">
+          ${team.experts.map(expert => `
+            <button class="expert-person${expert.added ? ' is-added' : ''}" type="button" data-team-id="${team.id}" data-expert-name="${escapeHtml(expert.name)}">
+              <img src="${expert.icon}" alt="" />
+              <span>
+                <strong>${escapeHtml(expert.name)}</strong>
+                <small>${escapeHtml(expert.desc)}</small>
+              </span>
+            </button>
+          `).join('')}
+        </div>
+      </article>
+    `}).join('');
+  } else {
+    const experts = teams.flatMap(team => team.experts.map(expert => ({ team, expert })));
+    grid.innerHTML = experts.map(({ team, expert }) => `
+      <button class="expert-agent-card${expert.added ? ' is-added' : ''}" type="button" data-team-id="${team.id}" data-expert-name="${escapeHtml(expert.name)}">
+        <img src="${expert.icon}" alt="" />
+        <strong>${escapeHtml(expert.name)}</strong>
+        <small>${escapeHtml(expert.desc)}</small>
+      </button>
+    `).join('');
+  }
+
+  grid.querySelectorAll('.expert-person, .expert-agent-card').forEach(item => {
+    item.addEventListener('click', () => openExpertDetail(item.dataset.teamId, item.dataset.expertName));
+  });
+  grid.querySelectorAll('.expert-team-add').forEach(button => {
+    button.addEventListener('click', e => {
+      e.stopPropagation();
+      startExpertTeamAdd(button.dataset.teamId);
+    });
+  });
+}
+
+function bindExpertMarketTabs() {
+  const tabs = document.querySelector('.expert-market-tabs');
+  if (!tabs || tabs.dataset.bound === 'true') return;
+  tabs.dataset.bound = 'true';
+  tabs.querySelectorAll('button:not(.expert-tab-more)').forEach(button => {
+    button.addEventListener('click', () => {
+      activeExpertMarketCategory = button.textContent.trim();
+      tabs.querySelectorAll('button').forEach(item => item.classList.toggle('is-active', item === button));
+      renderExpertMarket();
+      document.querySelector('.expert-market-scroll')?.scrollTo({ top: 0 });
+    });
+  });
+}
+
+function findMarketTeam(teamId) {
+  return EXPERT_MARKET_TEAMS.find(team => team.id === teamId);
+}
+
+function findMarketExpert(teamId, expertName) {
+  const team = findMarketTeam(teamId);
+  const expert = team?.experts.find(item => item.name === expertName);
+  return expert && team ? { team, expert } : null;
+}
+
+function findMarketExpertByName(expertName) {
+  for (const team of EXPERT_MARKET_TEAMS) {
+    const expert = team.experts.find(item => item.name === expertName);
+    if (expert) return { team, expert };
+  }
+  return null;
+}
+
+function isMarketTeamFullyAdded(team) {
+  return !!team?.added || !!team?.experts?.length && team.experts.every(expert => expert.added);
+}
+
+function syncExpertPersonState(teamId, expertName) {
+  const selector = `.expert-person[data-team-id="${CSS.escape(teamId)}"][data-expert-name="${CSS.escape(expertName)}"]`;
+  document.querySelector(selector)?.classList.add('is-added');
+  const cardSelector = `.expert-agent-card[data-team-id="${CSS.escape(teamId)}"][data-expert-name="${CSS.escape(expertName)}"]`;
+  document.querySelector(cardSelector)?.classList.add('is-added');
+}
+
+function syncExpertTeamButton(team) {
+  if (!team) return;
+  const button = document.querySelector(`.expert-team-add[data-team-id="${CSS.escape(team.id)}"]`);
+  if (!button) return;
+  const added = isMarketTeamFullyAdded(team);
+  button.classList.remove('is-adding');
+  button.classList.toggle('is-added', added);
+  button.disabled = added;
+  button.textContent = added ? '已添加' : '一键添加';
+}
+
+function addSingleMarketExpert(teamId, expertName) {
+  const found = findMarketExpert(teamId, expertName);
+  if (!found || found.expert.added) return;
+
+  found.expert.added = true;
+  syncExpertPersonState(teamId, expertName);
+  if (found.team.experts.every(expert => expert.added)) {
+    found.team.added = true;
+    syncExpertTeamButton(found.team);
+  }
+  renderClawAddedAgentList();
+  showExpertToast();
+}
+
+function openExpertDetail(teamId, expertName) {
+  const found = findMarketExpert(teamId, expertName);
+  const modal = document.getElementById('expert-detail-modal');
+  const body = document.getElementById('expert-detail-body');
+  const addButton = document.getElementById('expert-detail-add');
+  if (!found || !modal || !body || !addButton) return;
+
+  activeExpertMarketItem = found;
+  const skills = found.expert.skills || ['online-search', 'task-planning', 'content-summary', 'workflow-helper'];
+  body.innerHTML = `
+    <img class="expert-detail-avatar" src="${found.expert.icon}" alt="" />
+    <h2 id="expert-detail-title">${escapeHtml(found.expert.name)}</h2>
+    <p>${escapeHtml(found.expert.detail || `${found.expert.desc}。我会根据你的目标整理信息、拆解关键步骤，并把可执行建议同步给你。`)}</p>
+    <section>
+      <h3>核心技能</h3>
+      <div class="expert-skill-grid">
+        ${skills.map(skill => `<span><b aria-hidden="true"></b>${escapeHtml(skill)}</span>`).join('')}
+      </div>
+    </section>
+  `;
+  const added = found.expert.added || isMarketTeamFullyAdded(found.team);
+  addButton.textContent = added ? '去使用' : '添加';
+  addButton.disabled = false;
+  addButton.classList.toggle('is-use', added);
+  modal.hidden = false;
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeExpertDetail() {
+  const modal = document.getElementById('expert-detail-modal');
+  if (!modal) return;
+  modal.hidden = true;
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function showExpertToast() {
+  const toast = document.getElementById('expert-market-toast');
+  if (!toast) return;
+  clearTimeout(expertToastTimer);
+  toast.classList.add('is-visible');
+  toast.setAttribute('aria-hidden', 'false');
+  expertToastTimer = setTimeout(() => {
+    toast.classList.remove('is-visible');
+    toast.setAttribute('aria-hidden', 'true');
+  }, 1800);
+}
+
+function startExpertTeamAdd(teamId) {
+  const team = findMarketTeam(teamId);
+  const button = document.querySelector(`.expert-team-add[data-team-id="${CSS.escape(teamId)}"]`);
+  if (!team || !button || isMarketTeamFullyAdded(team) || button.classList.contains('is-adding')) return;
+
+  button.classList.add('is-adding');
+  button.disabled = true;
+  button.innerHTML = '<span class="expert-add-spinner" aria-hidden="true"></span><span>添加中</span>';
+
+  setTimeout(() => {
+    team.added = true;
+    team.experts.forEach(expert => {
+      expert.added = true;
+      syncExpertPersonState(team.id, expert.name);
+    });
+    syncExpertTeamButton(team);
+    renderClawAddedAgentList();
+    showExpertToast();
+  }, 1300);
+}
+
+function finishClawExpertSetup(queryText, options = {}) {
+  if (clawExpertsAdded) return;
+  if (options.selectAll) {
+    CLAW_EXPERTS.forEach(item => clawSelectedExperts.add(item.id));
+  }
+
+  clawExpertsAdded = true;
+  updateClawSelectionUI();
+
+  const article = document.querySelector('#claw-config-page .claw-dialog');
+  if (!article) return;
+  article.appendChild(createClawUserBubble(queryText));
+  scrollClawDialogToBottom();
+
+  const replyText = '好的，8 位专家智能体已经配置到位。\n接下来，你可以在输入框里 @ 智能体（比如 @ 预习官 或 @ 论文猎手），让他们开始干活。也可以直接告诉我的问题，我来搞定。现在手头有什么需要处理的吗？';
+  setTimeout(() => {
+    const reply = createClawAddedReply();
+    article.appendChild(reply);
+    scrollClawDialogToBottom();
+    typeClawText(reply.querySelector('.claw-added-reply-text'), replyText, { speed: 4, step: 1 }).then(() => {
+      reply.querySelector('.claw-reply-actions')?.removeAttribute('hidden');
+      reply.querySelector('.claw-followups')?.removeAttribute('hidden');
+      scrollClawDialogToBottom();
+    });
+  }, 520);
+}
+
+function handleClawAddFromButton() {
+  if (clawSelectedExperts.size === 0 || clawExpertsAdded) return;
+  const names = getClawSelectedExpertNames();
+  const query = `帮我安装${names.join('、')}这几位专家智能体。`;
+  finishClawExpertSetup(query);
+}
+
+function getClawComposerText() {
+  const editor = document.querySelector('#claw-config-page .claw-fixed-composer .prompt-editor');
+  return (editor?.innerText || '').replace(/\u00a0/g, ' ').trim();
+}
+
+function clearClawComposerText() {
+  const editor = document.querySelector('#claw-config-page .claw-fixed-composer .prompt-editor');
+  if (editor) editor.innerHTML = '';
+}
+
+function handleClawComposerSend() {
+  const text = getClawComposerText();
+  if (!text) return;
+  clearClawComposerText();
+  if (text.includes('全部添加')) {
+    finishClawExpertSetup(text, { selectAll: true });
+    return;
+  }
+
+  const article = document.querySelector('#claw-config-page .claw-dialog');
+  if (!article) return;
+  article.appendChild(createClawUserBubble(text));
+  scrollClawDialogToBottom();
+}
+
+document.getElementById('home-claw-chip')?.addEventListener('click', startClawEntryFlow);
+document.getElementById('home-sidebar-claw')?.addEventListener('click', startClawEntryFlow);
+
+document.querySelectorAll('.claw-config-sidebar [data-claw-section]').forEach(item => {
+  const activate = () => {
+    const section = item.dataset.clawSection;
+    if (section === 'expert-market' || section === 'skill' || section === 'config' || section === 'task' || section === 'subscription' || section === 'xiaotian') {
+      setClawConfigSection(section);
+    }
+  };
+  item.addEventListener('click', activate);
+  item.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    activate();
+  });
+});
+
+document.querySelectorAll('.claw-xiaotian-main [data-claw-section]').forEach(item => {
+  item.addEventListener('click', () => {
+    const section = item.dataset.clawSection;
+    if (section === 'skill' || section === 'task') setClawConfigSection(section);
+  });
+});
+
+document.querySelector('#expert-detail-modal .expert-detail-mask')?.addEventListener('click', closeExpertDetail);
+document.querySelector('#expert-detail-modal .expert-detail-close')?.addEventListener('click', closeExpertDetail);
+
+document.querySelector('#claw-skill-detail-modal .claw-skill-detail-mask')?.addEventListener('click', closeClawSkillDetail);
+document.querySelector('#claw-skill-detail-modal .claw-skill-detail-x')?.addEventListener('click', closeClawSkillDetail);
+document.getElementById('claw-skill-detail-add-btn')?.addEventListener('click', closeClawSkillDetail);
+document.querySelector('#claw-task-delete-modal .claw-task-delete-mask')?.addEventListener('click', closeTaskDeleteModal);
+document.querySelector('#claw-task-delete-modal .claw-task-delete-close')?.addEventListener('click', closeTaskDeleteModal);
+document.querySelector('#claw-task-delete-modal .claw-task-delete-cancel')?.addEventListener('click', closeTaskDeleteModal);
+document.querySelector('#claw-task-delete-modal .claw-task-delete-confirm')?.addEventListener('click', confirmTaskDelete);
+document.querySelectorAll('.claw-plan-card').forEach(card => {
+  card.addEventListener('click', () => {
+    if (card.dataset.plan === 'silver') return;
+    selectedSubscriptionPlan = card.dataset.plan || 'gold';
+    syncSubscriptionPlans();
+  });
+});
+document.addEventListener('click', event => {
+  if (!event.target.closest?.('.claw-task-card')) {
+    activeTaskMenuId = null;
+    if (clawConfigSection === 'task') renderClawTaskCenter();
+  }
+});
+document.getElementById('expert-detail-add')?.addEventListener('click', () => {
+  if (!activeExpertMarketItem) return;
+  const alreadyAdded = activeExpertMarketItem.expert.added || isMarketTeamFullyAdded(activeExpertMarketItem.team);
+  if (alreadyAdded) {
+    closeExpertDetail();
+    return;
+  }
+  const teamId = activeExpertMarketItem.team.id;
+  const expertName = activeExpertMarketItem.expert.name;
+  closeExpertDetail();
+  addSingleMarketExpert(teamId, expertName);
+});
+
+document.getElementById('agent-select-all')?.addEventListener('click', () => {
+  if (clawExpertsAdded) return;
+  if (clawSelectedExperts.size === CLAW_EXPERTS.length) {
+    clawSelectedExperts.clear();
+  } else {
+    CLAW_EXPERTS.forEach(item => clawSelectedExperts.add(item.id));
+  }
+  updateClawSelectionUI();
+});
+
+document.getElementById('agent-add-button')?.addEventListener('click', e => {
+  e.preventDefault();
+  handleClawAddFromButton();
+});
+
+document.querySelector('#claw-config-page .claw-fixed-composer .send-button')?.addEventListener('click', handleClawComposerSend);
+document.querySelector('#claw-config-page .claw-fixed-composer')?.addEventListener('submit', e => {
+  e.preventDefault();
+  handleClawComposerSend();
+});
+document.querySelector('#claw-config-page .claw-fixed-composer .prompt-editor')?.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
+  e.preventDefault();
+  handleClawComposerSend();
+});
+
+// Start the new demo in front of the existing experience.
+const initialClawFlowPage =
+  window.location.hash === '#config' || window.location.hash === '#xiaotian' || window.location.hash === '#skill' || window.location.hash === '#expert-market' || window.location.hash === '#task' || window.location.hash === '#subscription'
+    ? 'config'
+    : window.location.hash === '#loading'
+      ? 'loading'
+      : 'home';
+navHistory.splice(0, navHistory.length, `claw-${initialClawFlowPage}`);
+navCursor = 0;
+setClawFlowPage(initialClawFlowPage);
+if (window.location.hash === '#skill') setClawConfigSection('skill');
+if (window.location.hash === '#expert-market') setClawConfigSection('expert-market');
+if (window.location.hash === '#task') setClawConfigSection('task');
+if (window.location.hash === '#subscription') setClawConfigSection('subscription');
+if (window.location.hash === '#xiaotian') setClawConfigSection('xiaotian');
+updateNavButtons();

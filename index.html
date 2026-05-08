@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=69" />
+    <link rel="stylesheet" href="./styles.css?v=94" />
   </head>
   <body>
     <main class="app-shell">
@@ -63,6 +63,490 @@
             </div>
           </div>
         </header>
+
+        <div class="claw-flow" id="claw-flow" aria-label="天禧 Claw 开箱流程">
+          <section class="claw-flow-page claw-home-page" id="claw-home-page">
+            <aside class="home-rail" aria-label="主导航">
+              <button class="home-rail-toggle" type="button" aria-label="展开侧栏">
+                <img src="./custom-assets/claw-flow/sidebar-toggle.svg" alt="" />
+              </button>
+              <div class="home-rail-stack">
+                <button class="home-rail-new" type="button" aria-label="新建">
+                  <span></span>
+                </button>
+                <button class="home-rail-item" type="button" aria-label="知识库">
+                  <img src="./custom-assets/claw-flow/rail-note.svg" alt="" />
+                </button>
+                <button class="home-rail-item" type="button" aria-label="模型广场">
+                  <img src="./custom-assets/claw-flow/rail-model.svg" alt="" />
+                </button>
+                <button class="home-rail-item" type="button" aria-label="AI Space">
+                  <img src="./custom-assets/claw-flow/rail-space.svg" alt="" />
+                </button>
+                <button class="home-rail-item home-claw-entry" id="home-sidebar-claw" type="button" aria-label="进入天禧 Claw">
+                  <img src="./figma-assets/31648c85-08b3-4367-ae29-587fd6237d54.svg" alt="" />
+                </button>
+                <button class="home-rail-item" type="button" aria-label="历史纪录">
+                  <img src="./custom-assets/claw-flow/rail-history.svg" alt="" />
+                </button>
+              </div>
+            </aside>
+
+            <div class="home-content">
+              <div class="home-top-actions">
+                <span class="home-top-icon"><img src="./custom-assets/claw-flow/home-phone.svg" alt="" /></span>
+                <span class="home-top-icon"><img src="./custom-assets/claw-flow/home-bell.svg" alt="" /></span>
+              </div>
+
+              <div class="home-main">
+                <div class="home-greeting">
+                  <img class="home-orb" src="./custom-assets/claw-flow/home-orb.svg" alt="" />
+                  <h1>下午好，xin</h1>
+                </div>
+
+                <div class="home-feature-row" aria-label="推荐入口">
+                  <button class="home-feature-chip is-claw" id="home-claw-chip" type="button">
+                    <img src="./figma-assets/31648c85-08b3-4367-ae29-587fd6237d54.svg" alt="" />
+                    <span>天禧 Claw</span>
+                  </button>
+                  <button class="home-feature-chip home-feature-art feature-write-art" type="button" aria-label="AI写作"><img src="./custom-assets/claw-flow/feature-write-button.svg" alt="" /></button>
+                  <button class="home-feature-chip home-feature-art feature-translate-art" type="button" aria-label="AI翻译"><img src="./custom-assets/claw-flow/feature-translate-button.svg" alt="" /></button>
+                  <button class="home-feature-chip home-feature-art feature-control-art" type="button" aria-label="AI操控"><img src="./custom-assets/claw-flow/feature-control-button.svg" alt="" /></button>
+                  <button class="home-feature-chip home-feature-art feature-note-art" type="button" aria-label="AI妙记"><img src="./custom-assets/claw-flow/feature-note-button.svg" alt="" /></button>
+                  <button class="home-feature-chip home-feature-art feature-cc-art" type="button" aria-label="同声传译"><img src="./custom-assets/claw-flow/feature-cc-button.svg" alt="" /></button>
+                  <button class="home-feature-chip home-feature-art feature-all-art" type="button" aria-label="全部"><img src="./custom-assets/claw-flow/feature-all-button.svg" alt="" /></button>
+                </div>
+
+                <div class="home-prompt-card">
+                  <img class="home-prompt-art" src="./custom-assets/claw-flow/home-input.svg" alt="" />
+                  <div class="home-prompt-placeholder">你可以问我任何问题...</div>
+                  <div class="home-prompt-toolbar">
+                    <div class="home-prompt-left">
+                      <button class="home-model-pill home-model-select" type="button">
+                        <span>天禧×DeepSeek-V3.1</span>
+                        <span class="model-chevron" aria-hidden="true"></span>
+                      </button>
+                      <button class="home-model-pill" type="button"><span class="pill-icon-think"></span>深度思考</button>
+                    </div>
+                    <div class="home-prompt-tools">
+                      <span class="tool-mini tool-cut"></span>
+                      <span class="tool-mini tool-file"></span>
+                      <span class="tool-mini tool-image"></span>
+                      <span class="tool-mini tool-voice"></span>
+                      <span class="home-tool-divider"></span>
+                      <button class="home-send" type="button" aria-label="发送"></button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="home-discover">
+                  <div class="home-discover-hint"><span class="home-scroll-icon"></span>向下滚动，发现你的专属内容</div>
+                  <div class="home-card-grid">
+                    <article class="home-news-card">
+                      <h3>比亚迪第二代兆瓦闪充设施大规模部署：2100KW功率，5分钟补能500公里</h3>
+                      <img src="https://www.figma.com/api/mcp/asset/c6bd20a1-cccd-48d3-aa05-0f4e8bb49b6d" alt="" />
+                    </article>
+                    <article class="home-query-card">
+                      <button type="button">使用AI插件提升排版效率？<span class="query-arrow"></span></button>
+                      <button type="button">联想电脑怎么选<span class="query-arrow"></span></button>
+                    </article>
+                    <article class="home-weather-card">
+                      <span>2016-01-21</span>
+                      <strong>29°</strong>
+                      <small>多云间晴<br />海淀区　36°~13°</small>
+                    </article>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="claw-flow-page claw-loading-page" id="claw-loading-page" aria-live="polite">
+            <div class="loading-center">
+              <div class="loading-mascot-wrap">
+                <img class="loading-mascot" src="./custom-assets/claw-flow/loading-claw.png" alt="" />
+                <span class="loading-beta">Beta</span>
+              </div>
+              <h2>正在加载天禧Claw，请稍候</h2>
+              <div class="loading-progress" role="progressbar" aria-label="加载进度" aria-valuemin="0" aria-valuemax="100">
+                <span id="claw-loading-bar"></span>
+              </div>
+              <p>首次加载可能需要几分钟时间，请勿关闭窗口</p>
+            </div>
+          </section>
+
+          <section class="claw-flow-page claw-config-page" id="claw-config-page">
+            <aside class="claw-config-sidebar">
+              <div class="claw-side-logo">
+                <img src="./figma-assets/31648c85-08b3-4367-ae29-587fd6237d54.svg" alt="" />
+                <strong>天禧Claw</strong>
+                <img class="side-collapse-icon" src="./custom-assets/claw-flow/sidebar-toggle.svg" alt="" />
+              </div>
+              <button class="claw-new-agent" type="button" aria-label="新建数字员工">
+                <img class="claw-new-agent-art" src="./custom-assets/claw-flow/new-agent-button.svg" alt="" />
+                <span class="claw-new-agent-label">新建数字员工</span>
+              </button>
+              <div class="claw-sidebar-work-scroll" aria-label="Claw 工作区导航">
+                <button class="claw-agent-brief" type="button" data-claw-section="xiaotian" aria-label="小天">
+                  <img src="./custom-assets/claw-flow/claw-avatar.png" alt="" />
+                  <span><strong>小天</strong><small>开箱即用，越用越强，7x24...</small></span>
+                </button>
+                <span class="claw-config-entry is-active" data-claw-section="config" role="button" tabindex="0"><img src="./custom-assets/claw-flow/nav-config.svg" alt="" />帮我解读这个文件</span>
+                <div class="claw-sidebar-work-divider" aria-hidden="true"></div>
+                <div class="claw-added-agent-list" id="claw-added-agent-list" aria-label="已添加智能体"></div>
+              </div>
+              <nav class="claw-config-nav" aria-label="Claw 导航">
+                <span data-claw-section="expert-market" role="button" tabindex="0"><img src="./custom-assets/claw-flow/nav-agent-market.svg" alt="" />智能体集市</span>
+                <span data-claw-section="skill" role="button" tabindex="0"><img src="./custom-assets/claw-flow/nav-skill-upload.svg" alt="" />技能广场</span>
+                <span data-claw-section="task" role="button" tabindex="0"><img src="./custom-assets/claw-flow/nav-task-upload.svg" alt="" />任务中心</span>
+              </nav>
+              <button class="claw-subscription-entry" type="button" aria-label="订阅管理" data-claw-section="subscription">
+                <img src="./custom-assets/claw-flow/subscription-manage.svg" alt="" />
+                <span>订阅管理</span>
+              </button>
+            </aside>
+
+            <div class="claw-config-main">
+              <div class="claw-config-tip">
+                <span class="tip-badge">玩转手册</span>
+                <span class="tip-icon-btn"><img src="./figma-assets/943e5836-dc3f-4649-b350-d6d53802ca17.svg" alt="" /></span>
+                <span class="tip-icon-btn"><img src="./figma-assets/31a5484d-800b-45f9-9edd-88087b498f6c.svg" alt="" /></span>
+              </div>
+              <div class="claw-dialog-scroll">
+                <article class="claw-dialog is-intro-pending-root">
+                  <p>嗨，我是天禧 Claw。</p>
+                  <p>很高兴认识您——从知识库和专属工作台了解到您是一名在校学生，从您点进来的这一刻起，我就已经在想怎么帮到您了。</p>
+                  <p>大学时光并不轻松。课听不懂、作业卡壳、考试周焦虑，这些时刻几乎每个人都经历过。我虽没办法替您上课、替您考试，但我可以一直在您身边——听不懂的时候帮您讲透，卡住的时候帮您捋清，考前帮您把重点理明白。</p>
+                  <p>另外，我还为您备了一支专家团队——「学霸后援团」。</p>
+                  <p>他们各有专精，我遇到搞不定的事会直接调度他们上场。成员一共8位：</p>
+
+                  <div class="agent-select-grid" id="agent-select-grid" aria-label="选择智能体卡片"></div>
+
+                  <div class="agent-selection-bar">
+                    <button class="agent-select-all" id="agent-select-all" type="button" aria-checked="mixed">
+                      <span class="agent-select-box" aria-hidden="true"></span>
+                      <span>全选</span>
+                    </button>
+                    <span class="agent-selected-count" id="agent-selected-count">已选 4/8 位专家</span>
+                    <button class="agent-add-button" id="agent-add-button" type="button">一键添加</button>
+                  </div>
+
+                  <p>想了解某位成员的具体能力，告诉我就行；如果觉得都用得上，回复「全部添加」，我来帮您配置到位。</p>
+                </article>
+              </div>
+
+              <form class="claw-fixed-composer">
+                <div class="composer-glow"></div>
+                <div class="composer-card">
+                  <div class="composer-input-wrap">
+                    <div
+                      class="prompt-editor"
+                      contenteditable="true"
+                      role="textbox"
+                      aria-multiline="true"
+                      data-placeholder="输入任务描述或提问任何问题"
+                    ></div>
+                  </div>
+                  <div class="composer-toolbar">
+                    <div class="toolbar-left">
+                      <div class="pill-select pill-art-select" aria-label="技能"><img src="./custom-assets/claw-flow/skill-button.svg" alt="" /></div>
+                      <div class="pill-select pill-art-select" aria-label="提及"><img src="./custom-assets/claw-flow/mention-button.svg" alt="" /></div>
+                    </div>
+                    <div class="toolbar-right">
+                      <div class="tool-group-wrap">
+                        <div class="tool-group">
+                          <div class="tool-icon"><img src="./文件.svg" alt="" /></div>
+                          <div class="tool-icon"><img src="./图片.svg" alt="" /></div>
+                          <div class="tool-icon"><img src="./语音.svg" alt="" /></div>
+                        </div>
+                        <span class="toolbar-divider"></span>
+                      </div>
+                      <button class="send-button" type="button"><img src="./send.svg" alt="" /></button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div class="claw-xiaotian-main" id="claw-xiaotian-main" hidden>
+              <div class="claw-xiaotian-tip">
+                <span class="tip-badge">玩转手册</span>
+                <span class="tip-icon-btn"><img src="./figma-assets/943e5836-dc3f-4649-b350-d6d53802ca17.svg" alt="" /></span>
+                <span class="tip-icon-btn"><img src="./figma-assets/31a5484d-800b-45f9-9edd-88087b498f6c.svg" alt="" /></span>
+              </div>
+              <div class="claw-xiaotian-content">
+                <img class="claw-xiaotian-hero" src="./custom-assets/claw-flow/xiaotian-wave.svg" alt="小天" />
+                <div class="claw-xiaotian-quick-row" aria-label="快捷入口">
+                  <button type="button">
+                    <span class="claw-xiaotian-quick-icon">+</span>
+                    <strong>新建一个数字员工</strong>
+                    <small>专家智能体一起干活</small>
+                  </button>
+                  <button type="button" data-claw-section="task">
+                    <span class="claw-xiaotian-quick-icon">⏱</span>
+                    <strong>任务中心</strong>
+                    <small>到点自动帮你办事</small>
+                  </button>
+                  <button type="button">
+                    <span class="claw-xiaotian-quick-icon">?</span>
+                    <strong>快速入门</strong>
+                    <small>快速获取使用灵感</small>
+                  </button>
+                  <button type="button" data-claw-section="skill">
+                    <span class="claw-xiaotian-quick-icon">✦</span>
+                    <strong>教他一个技能</strong>
+                    <small>让智能体学会你的技能</small>
+                  </button>
+                </div>
+                <button class="claw-xiaotian-input" type="button" aria-label="输入任务描述或提问任何问题">
+                  <img src="./custom-assets/claw-flow/xiaotian-input.svg" alt="" />
+                </button>
+              </div>
+            </div>
+
+            <div class="claw-expert-market-main" id="claw-expert-market-main" hidden>
+              <div class="expert-market-toast" id="expert-market-toast" aria-hidden="true">
+                <img src="./custom-assets/claw-flow/add-toast.svg" alt="" />
+              </div>
+              <div class="expert-market-scroll">
+                <header class="expert-market-header">
+                  <h2>智能体集市</h2>
+                  <label class="expert-market-search">
+                    <span aria-hidden="true"></span>
+                    <input type="search" placeholder="搜索智能体" aria-label="搜索智能体" />
+                  </label>
+                </header>
+                <div class="expert-market-tabs" aria-label="智能体分类">
+                  <button class="is-active" type="button">一人公司</button>
+                  <button type="button">学术教育</button>
+                  <button type="button">产品设计</button>
+                  <button type="button">技术工程</button>
+                  <button type="button">法务</button>
+                  <button type="button">人力行政</button>
+                  <button type="button">金融</button>
+                  <button type="button">营销增长</button>
+                  <button type="button">数据分析</button>
+                  <button class="expert-tab-more" type="button" aria-label="更多分类"><img src="./custom-assets/claw-flow/market-tab-arrow.svg" alt="" /></button>
+                </div>
+                <div class="expert-team-grid" id="expert-team-grid" aria-label="智能体集市列表"></div>
+              </div>
+            </div>
+
+            <div class="claw-skill-market-main" id="claw-skill-market-main" hidden>
+              <div class="claw-skill-market-scroll">
+                <header class="claw-skill-market-header">
+                  <h2>技能广场</h2>
+                  <div class="claw-skill-market-header-right">
+                    <div class="claw-skill-search-wrap">
+                      <div class="claw-skill-market-search">
+                        <img class="claw-skill-market-search-icon" src="./icon/skills-search.svg?v=2" alt="" />
+                        <input type="search" placeholder="搜索技能名称、描述或标签" aria-label="搜索技能" />
+                        <button class="claw-skill-market-search-clear" type="button" aria-label="清空搜索">×</button>
+                      </div>
+                      <div class="claw-skill-search-popover" id="claw-skill-search-popover" hidden></div>
+                    </div>
+                    <button class="claw-skill-market-btn claw-skill-market-btn-ghost" type="button">
+                      <img src="./icon/skills-manage.svg" alt="" />
+                      管理技能
+                    </button>
+                    <button class="claw-skill-market-btn claw-skill-market-btn-solid" type="button">
+                      <img src="./icon/skills-add.svg" alt="" />
+                      新建技能
+                    </button>
+                  </div>
+                </header>
+
+                <div class="claw-skill-promo-row" aria-hidden="true">
+                  <div class="claw-skill-promo">
+                    <img src="./custom-assets/claw-flow/skill-market/banner-orange.png" alt="" />
+                  </div>
+                  <div class="claw-skill-promo">
+                    <img src="./custom-assets/claw-flow/skill-market/banner-blue.png" alt="" />
+                  </div>
+                </div>
+
+                <div class="claw-skill-toolbar">
+                  <span class="claw-skill-toolbar-title">全部技能</span>
+                  <div class="claw-skill-sort" role="group" aria-label="排序">
+                    <button type="button" class="claw-skill-sort-btn">按最多添加数</button>
+                    <button type="button" class="claw-skill-sort-btn is-active">按最近时间</button>
+                  </div>
+                </div>
+
+                <div class="claw-skill-category-tabs" id="claw-skill-category-tabs" aria-label="技能分类">
+                  <button class="is-active" type="button">工作提效</button>
+                  <button type="button">学习教育</button>
+                  <button type="button">娱乐体验</button>
+                  <button type="button">生活服务</button>
+                  <button type="button">法律服务</button>
+                  <button type="button">工业设计</button>
+                  <button type="button">媒体创作</button>
+                  <button type="button">编程开发</button>
+                </div>
+
+                <div class="claw-skill-card-grid" id="claw-skill-card-grid" aria-label="技能列表"></div>
+              </div>
+            </div>
+
+            <div class="claw-task-center-main" id="claw-task-center-main" hidden>
+              <div class="claw-task-center-scroll">
+                <header class="claw-task-header">
+                  <h2>任务中心</h2>
+                  <button class="claw-task-new-btn" type="button"><span aria-hidden="true">+</span>新建任务</button>
+                </header>
+                <div class="claw-task-grid" id="claw-task-grid" aria-label="任务列表"></div>
+              </div>
+            </div>
+
+            <div class="claw-subscription-main" id="claw-subscription-main" hidden>
+              <div class="claw-subscription-scroll">
+                <header class="claw-subscription-header">
+                  <h2>订阅管理</h2>
+                </header>
+                <section class="claw-subscription-summary" aria-label="订阅概览">
+                  <div class="claw-member-card">
+                    <span class="claw-member-status">生效中</span>
+                    <strong>白银会员</strong>
+                    <small>有效期：2026.05.04　连续包月</small>
+                  </div>
+                  <div class="claw-energy-panel">
+                    <div class="claw-energy-title">总能量 <span>35,000</span></div>
+                    <div class="claw-energy-stats">
+                      <div>
+                        <span>订阅能量</span>
+                        <strong>25,000 <em>/40,000</em></strong>
+                        <i aria-hidden="true"><b></b></i>
+                      </div>
+                      <div>
+                        <span>永久能量</span>
+                        <strong>10,000</strong>
+                        <button type="button">购买能量</button>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+                <div class="claw-subscription-tabs" role="tablist" aria-label="订阅类型">
+                  <button class="is-active" type="button">订阅计划</button>
+                  <button type="button">能量消耗</button>
+                </div>
+                <section class="claw-plan-grid" aria-label="订阅套餐">
+                  <button class="claw-plan-card" type="button" data-plan="silver" aria-disabled="true">
+                    <span class="claw-plan-name">白银</span>
+                    <small>满足日常轻度使用</small>
+                    <span class="claw-plan-price"><em>¥</em>49<i>/月</i></span>
+                    <span class="claw-plan-action">你已是白银用户</span>
+                    <span class="claw-plan-energy"><b>40,000</b> 能量 <i>（有效期30天）</i></span>
+                  </button>
+                  <button class="claw-plan-card is-selected" type="button" data-plan="gold">
+                    <span class="claw-plan-name">黄金</span>
+                    <small>满足办公学习高频使用</small>
+                    <span class="claw-plan-price"><em>¥</em>99<i>/月</i></span>
+                    <span class="claw-plan-action">立即订阅</span>
+                    <span class="claw-plan-energy"><b>90,000</b> 能量 <i>（有效期30天）</i></span>
+                  </button>
+                  <button class="claw-plan-card" type="button" data-plan="diamond">
+                    <span class="claw-plan-name">钻石</span>
+                    <small>满足多场景重度使用</small>
+                    <span class="claw-plan-price"><em>¥</em>199<i>/月</i></span>
+                    <span class="claw-plan-action">立即订阅</span>
+                    <span class="claw-plan-energy"><b>200,000</b> 能量 <i>（有效期30天）</i></span>
+                  </button>
+                </section>
+                <footer class="claw-subscription-contact">
+                  开发票联系客服QQ：273619164
+                  <span aria-hidden="true"></span>
+                </footer>
+              </div>
+            </div>
+
+            <div class="claw-task-delete-modal" id="claw-task-delete-modal" hidden aria-hidden="true">
+              <button class="claw-task-delete-mask" type="button" aria-label="取消删除"></button>
+              <div class="claw-task-delete-dialog" role="dialog" aria-modal="true" aria-labelledby="claw-task-delete-title">
+                <button class="claw-task-delete-close" type="button" aria-label="关闭">×</button>
+                <h3 id="claw-task-delete-title">确认删除任务吗？</h3>
+                <p>删除后，该任务将无法恢复</p>
+                <div class="claw-task-delete-actions">
+                  <button class="claw-task-delete-cancel" type="button">取消</button>
+                  <button class="claw-task-delete-confirm" type="button">确认</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="expert-detail-modal" id="expert-detail-modal" hidden aria-hidden="true">
+              <button class="expert-detail-mask" type="button" aria-label="关闭详情"></button>
+              <div class="expert-detail-card" role="dialog" aria-modal="true" aria-labelledby="expert-detail-title">
+                <button class="expert-detail-close" type="button" aria-label="关闭详情">×</button>
+                <div class="expert-detail-body" id="expert-detail-body"></div>
+                <div class="expert-detail-footer">
+                  <button class="expert-detail-add" id="expert-detail-add" type="button">添加</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="claw-skill-detail-modal" id="claw-skill-detail-modal" hidden aria-hidden="true">
+              <button class="claw-skill-detail-mask" type="button" aria-label="关闭"></button>
+              <div
+                class="claw-skill-detail-card"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="claw-skill-detail-name"
+              >
+                <button class="claw-skill-detail-x" type="button" aria-label="关闭">
+                  <img src="./icon/skills-detail-close.svg" alt="" />
+                </button>
+                <div class="claw-skill-detail-scroll">
+                  <div class="claw-skill-detail-hero">
+                    <div class="claw-skill-detail-icon-wrap">
+                      <img class="claw-skill-detail-icon" id="claw-skill-detail-icon" src="" alt="" />
+                    </div>
+                    <div class="claw-skill-detail-name" id="claw-skill-detail-name"></div>
+                    <div class="claw-skill-detail-sub" id="claw-skill-detail-sub"></div>
+                    <div class="claw-skill-detail-tags" id="claw-skill-detail-tags"></div>
+                    <p class="claw-skill-detail-longdesc" id="claw-skill-detail-longdesc"></p>
+                  </div>
+
+                  <div class="claw-skill-detail-meta" id="claw-skill-detail-meta">
+                    <div class="claw-skill-detail-meta-item">
+                      <div class="claw-skill-detail-meta-val" id="claw-skill-detail-author"></div>
+                      <div class="claw-skill-detail-meta-key">开发者</div>
+                    </div>
+                    <div class="claw-skill-detail-meta-divider"></div>
+                    <div class="claw-skill-detail-meta-item">
+                      <div class="claw-skill-detail-meta-val" id="claw-skill-detail-count"></div>
+                      <div class="claw-skill-detail-meta-key">添加次数</div>
+                    </div>
+                    <div class="claw-skill-detail-meta-divider"></div>
+                    <div class="claw-skill-detail-meta-item">
+                      <div class="claw-skill-detail-meta-val" id="claw-skill-detail-source"></div>
+                      <div class="claw-skill-detail-meta-key">来源</div>
+                    </div>
+                    <div class="claw-skill-detail-meta-divider"></div>
+                    <div class="claw-skill-detail-meta-item">
+                      <div class="claw-skill-detail-meta-val" id="claw-skill-detail-updated"></div>
+                      <div class="claw-skill-detail-meta-key">更新时间</div>
+                    </div>
+                  </div>
+
+                  <div class="claw-skill-detail-howto" id="claw-skill-detail-howto" hidden>
+                    <div class="claw-skill-detail-howto-head">
+                      <span class="claw-skill-detail-howto-doc" aria-hidden="true"></span>
+                      <span>怎么使用？</span>
+                    </div>
+                    <div class="claw-skill-detail-howto-list" id="claw-skill-detail-howto-list"></div>
+                  </div>
+                </div>
+
+                <div class="claw-skill-detail-footer">
+                  <button class="claw-skill-detail-add-btn" id="claw-skill-detail-add-btn" type="button">去添加</button>
+                  <div class="claw-skill-detail-safe">
+                    <img class="claw-skill-detail-safe-icon" src="./custom-assets/claw-flow/qianxin-safe.svg" alt="" />
+                    <span id="claw-skill-detail-safe-text"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
 
         <div class="window-body">
           <div class="top-tip">
@@ -338,7 +822,7 @@
                     <div class="skills-market-title">技能广场</div>
                     <div class="skills-market-actions">
                       <div class="skills-market-search" role="search">
-                        <img class="skills-market-search-icon" src="./icon/skills-search.svg" alt="" />
+                        <img class="skills-market-search-icon" src="./icon/skills-search.svg?v=2" alt="" />
                         <input class="skills-market-search-input" placeholder="搜索技能名称、描述或标签" />
                         <div class="skills-market-autocomplete" id="skills-market-autocomplete" role="listbox" aria-label="搜索联想"></div>
                       </div>
@@ -945,7 +1429,7 @@
                   </div>
 
                   <div class="skills-detail-footer">
-                    <button class="skills-detail-primary" type="button">去添加</button>
+                    <button class="skills-detail-primary" type="button">添加</button>
                     <div class="skills-detail-foot">
                       <img class="skills-detail-safe-icon" src="./icon/skills-detail-safe.svg" alt="" />
                       <span>已通过安全与合规验证，无恶意代码或数据泄露风险。</span>
@@ -1316,6 +1800,6 @@
       </section>
     </main>
 
-    <script src="./script.js?v=60"></script>
+    <script src="./script.js?v=80"></script>
   </body>
 </html>
