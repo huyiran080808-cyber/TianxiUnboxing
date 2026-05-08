@@ -5185,7 +5185,7 @@ function renderClawAgentHome() {
   const isXiaotian = (agent.id || agent.name) === (CLAW_XIAOTIAN_HOME.id || CLAW_XIAOTIAN_HOME.name);
   main?.classList.toggle('is-custom-agent-home', !isXiaotian);
   if (avatar) {
-    avatar.src = agent.icon || CLAW_XIAOTIAN_HOME.icon;
+    avatar.src = isXiaotian ? './custom-assets/claw-flow/claw-avatar-hero.png' : agent.icon || CLAW_XIAOTIAN_HOME.icon;
     avatar.alt = agent.name || '';
   }
   if (title) title.innerHTML = `Hi，我是<span class="claw-agent-name-underline">${escapeHtml(agent.name || '小天')}</span>`;
@@ -5294,7 +5294,7 @@ function setClawComposerSkillFill(form, skill) {
 function setClawComposerMentionFill(form, agent) {
   const editor = getClawComposerEditor(form);
   if (!editor || !agent) return;
-  editor.innerHTML = `请让 <span class="claw-inline-mention" contenteditable="false"><img src="${escapeHtml(agent.icon)}" alt="" /><span>@${escapeHtml(agent.name)}</span></span> 帮我处理：${escapeHtml(agent.desc || '')}`;
+  editor.innerHTML = `<span class="claw-inline-mention" contenteditable="false"><img src="${escapeHtml(agent.icon)}" alt="" /><span>${escapeHtml(agent.name)}</span></span>`;
   form.classList.add('has-claw-composer-fill');
   closeClawComposerPopover();
   editor.focus();

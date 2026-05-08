@@ -3014,7 +3014,10 @@ textarea {
 }
 
 .claw-agent-home-composer .composer-input-wrap {
+  position: relative;
   min-height: 48px;
+  box-sizing: border-box;
+  padding: 20px 18px 0;
   opacity: 0;
   pointer-events: none;
 }
@@ -3028,6 +3031,9 @@ textarea {
 .claw-agent-home-composer .prompt-editor {
   min-height: 44px;
   max-height: 58px;
+  position: relative;
+  z-index: 1;
+  padding-left: 0;
   padding-top: 0;
   padding-right: 12px;
   color: rgba(255, 255, 255, 0.9);
@@ -3037,6 +3043,18 @@ textarea {
 .claw-agent-home-composer.has-claw-composer-fill .composer-input-wrap {
   opacity: 1;
   pointer-events: auto;
+}
+
+.claw-agent-home-composer.has-claw-composer-fill .composer-input-wrap::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 18px;
+  right: 150px;
+  top: 16px;
+  height: 28px;
+  background: #000;
+  pointer-events: none;
 }
 
 .claw-agent-home-composer .pill-select {
@@ -5871,12 +5889,28 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 4px;
-}
-
-.claw-composer-popover.is-mention .claw-composer-popover-list {
   max-height: 266px;
   overflow-y: auto;
   padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.claw-composer-popover-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.claw-composer-popover-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.claw-composer-popover-list::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.claw-composer-popover-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.26);
 }
 
 .claw-composer-popover-item {
