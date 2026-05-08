@@ -5272,7 +5272,7 @@ function closeClawComposerPopover() {
 
 function positionClawComposerPopover(popover, trigger) {
   const rect = trigger.getBoundingClientRect();
-  const gap = 10;
+  const gap = 4;
   const width = popover.offsetWidth || 300;
   const height = popover.offsetHeight || 260;
   const left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12));
