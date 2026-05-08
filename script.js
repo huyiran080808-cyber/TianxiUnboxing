@@ -4999,6 +4999,7 @@ function setClawFlowPage(page) {
 function setClawConfigSection(section) {
   const allowed = new Set(['config', 'xiaotian', 'expert-market', 'skill', 'task', 'subscription']);
   clawConfigSection = allowed.has(section) ? section : 'config';
+  closeClawComposerPopover();
   const configPage = document.getElementById('claw-config-page');
   const configMain = document.querySelector('#claw-config-page .claw-config-main');
   const xiaotianMain = document.getElementById('claw-xiaotian-main');
@@ -5219,6 +5220,127 @@ function renderClawAddedAgentList() {
       if (agent) openClawAgentHome(agent);
     });
   });
+}
+
+let clawComposerPopover = null;
+let activeClawComposerForm = null;
+
+function getClawComposerForm(trigger) {
+  return trigger?.closest?.('.claw-fixed-composer, .claw-agent-home-composer') || null;
+}
+
+function getClawComposerEditor(form) {
+  return form?.querySelector?.('.prompt-editor') || null;
+}
+
+function getClawComposerSkills() {
+  return CLAW_SKILL_PLAZA_ITEMS.map(item => ({
+    id: item.id,
+    name: item.subtitle || item.slug,
+    desc: item.slug || item.desc || '',
+    icon: item.icon,
+    fill: item.subtitle || item.slug,
+  }));
+}
+
+function getClawComposerMentionAgents() {
+  const byName = new Map();
+  EXPERT_MARKET_TEAMS.forEach(team => {
+    team.experts.forEach(expert => {
+      if (!byName.has(expert.name)) {
+        byName.set(expert.name, { ...expert, teamId: team.id });
+      }
+    });
+  });
+  return [...byName.values()];
+}
+
+function ensureClawComposerPopover() {
+  if (clawComposerPopover) return clawComposerPopover;
+  clawComposerPopover = document.createElement('div');
+  clawComposerPopover.className = 'claw-composer-popover';
+  document.body.appendChild(clawComposerPopover);
+  return clawComposerPopover;
+}
+
+function closeClawComposerPopover() {
+  if (!clawComposerPopover) return;
+  clawComposerPopover.remove();
+  clawComposerPopover = null;
+  activeClawComposerForm = null;
+}
+
+function positionClawComposerPopover(popover, trigger) {
+  const rect = trigger.getBoundingClientRect();
+  const gap = 10;
+  const width = popover.offsetWidth || 300;
+  const height = popover.offsetHeight || 260;
+  const left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12));
+  const preferredTop = rect.top - height - gap;
+  const top = preferredTop >= 12 ? preferredTop : Math.min(rect.bottom + gap, window.innerHeight - height - 12);
+  popover.style.left = `${left}px`;
+  popover.style.top = `${Math.max(12, top)}px`;
+}
+
+function setClawComposerSkillFill(form, skill) {
+  const editor = getClawComposerEditor(form);
+  if (!editor || !skill) return;
+  editor.innerHTML = `<span class="claw-inline-skill">/${escapeHtml(skill.fill || skill.name)}</span>`;
+  form.classList.add('has-claw-composer-fill');
+  closeClawComposerPopover();
+  editor.focus();
+}
+
+function setClawComposerMentionFill(form, agent) {
+  const editor = getClawComposerEditor(form);
+  if (!editor || !agent) return;
+  editor.innerHTML = `请让 <span class="claw-inline-mention" contenteditable="false"><img src="${escapeHtml(agent.icon)}" alt="" /><span>@${escapeHtml(agent.name)}</span></span> 帮我处理：${escapeHtml(agent.desc || '')}`;
+  form.classList.add('has-claw-composer-fill');
+  closeClawComposerPopover();
+  editor.focus();
+}
+
+function openClawComposerPopover(type, trigger) {
+  const form = getClawComposerForm(trigger);
+  if (!form) return;
+  const isSkill = type === 'skill';
+  const items = isSkill ? getClawComposerSkills() : getClawComposerMentionAgents();
+  activeClawComposerForm = form;
+
+  const popover = ensureClawComposerPopover();
+  popover.className = `claw-composer-popover is-${isSkill ? 'skill' : 'mention'}`;
+  popover.style.visibility = 'hidden';
+  popover.innerHTML = `
+    <div class="claw-composer-popover-title">${isSkill ? '选择技能' : '提及智能体'}</div>
+    <div class="claw-composer-popover-list">
+      ${items.map((item, index) => `
+        <button class="claw-composer-popover-item" type="button" data-index="${index}">
+          <img src="${escapeHtml(item.icon)}" alt="" />
+          <span>
+            <strong>${escapeHtml(item.name)}</strong>
+            <small>${escapeHtml(item.desc || '')}</small>
+          </span>
+        </button>
+      `).join('')}
+    </div>
+    ${isSkill ? '<button class="claw-composer-popover-manage" type="button">管理技能</button>' : ''}
+  `;
+
+  popover.querySelectorAll('.claw-composer-popover-item').forEach(button => {
+    button.addEventListener('click', () => {
+      const item = items[Number(button.dataset.index)];
+      if (isSkill) setClawComposerSkillFill(activeClawComposerForm, item);
+      else setClawComposerMentionFill(activeClawComposerForm, item);
+    });
+  });
+
+  popover.querySelector('.claw-composer-popover-manage')?.addEventListener('click', () => {
+    closeClawComposerPopover();
+    setClawConfigSection('skill');
+  });
+
+  positionClawComposerPopover(popover, trigger);
+  popover.style.visibility = 'visible';
 }
 
 function scrollClawDialogToBottom() {
@@ -5831,6 +5953,30 @@ document.querySelector('#claw-config-page .claw-fixed-composer .prompt-editor')?
   if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
   e.preventDefault();
   handleClawComposerSend();
+});
+document.querySelectorAll('#claw-config-page .claw-fixed-composer .pill-art-select[aria-label="技能"], #claw-config-page .claw-agent-home-composer .pill-art-select[aria-label="技能"]').forEach(button => {
+  button.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    openClawComposerPopover('skill', button);
+  });
+});
+document.querySelectorAll('#claw-config-page .claw-fixed-composer .pill-art-select[aria-label="提及"], #claw-config-page .claw-agent-home-composer .pill-art-select[aria-label="提及"]').forEach(button => {
+  button.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    openClawComposerPopover('mention', button);
+  });
+});
+document.addEventListener('click', event => {
+  if (!clawComposerPopover) return;
+  const target = event.target;
+  if (clawComposerPopover.contains(target)) return;
+  if (target.closest?.('#claw-config-page .pill-art-select[aria-label="技能"], #claw-config-page .pill-art-select[aria-label="提及"]')) return;
+  closeClawComposerPopover();
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') closeClawComposerPopover();
 });
 
 // Start the new demo in front of the existing experience.
