@@ -4089,55 +4089,100 @@ let clawLoadingTimer = null;
 let clawLoadingFrame = null;
 let clawExpertsAdded = false;
 let clawIntroAnimationStarted = false;
+let clawAddedSequence = 1;
+
+const CLAW_AVATAR_DIR = './custom-assets/claw-flow/avatars/';
+const CLAW_AGENT_AVATARS = {
+  '学习规划师': `${CLAW_AVATAR_DIR}高级项目经理.png`,
+  '论文速读导师': `${CLAW_AVATAR_DIR}高级数据分析师.png`,
+  'AI论文速读导师': `${CLAW_AVATAR_DIR}高级数据分析师.png`,
+  '资料整理大师': `${CLAW_AVATAR_DIR}制度文件撰写专家.png`,
+  '考前冲刺哥': `${CLAW_AVATAR_DIR}私人健身教练.png`,
+  '外语一对一私教': `${CLAW_AVATAR_DIR}外语一对一老师.png`,
+  '论文猎手': `${CLAW_AVATAR_DIR}腾讯问卷设计专家.png`,
+  '预习官': `${CLAW_AVATAR_DIR}日志异常分析专家.png`,
+  '目标拆解教练': `${CLAW_AVATAR_DIR}目标拆解教练.png`,
+  '深夜解压大师': `${CLAW_AVATAR_DIR}深夜解压大师.png`,
+  '留学规划顾问': `${CLAW_AVATAR_DIR}留学规划顾问.png`,
+  '高考志愿填报顾问': `${CLAW_AVATAR_DIR}高考志愿填报顾问.png`,
+  '跨境电商情报探长': `${CLAW_AVATAR_DIR}跨境社媒营销官.png`,
+  'TikTok策略师': `${CLAW_AVATAR_DIR}抖音运营.png`,
+  '库存预测专家': `${CLAW_AVATAR_DIR}高级数据分析师.png`,
+  'PPC竞价策略师': `${CLAW_AVATAR_DIR}金融风控分析师.png`,
+  '产品经理': `${CLAW_AVATAR_DIR}高级项目经理.png`,
+  'UI设计师': `${CLAW_AVATAR_DIR}种草图文设计师.png`,
+  '前端开发者': `${CLAW_AVATAR_DIR}提示词工程师.png`,
+  '后端架构师': `${CLAW_AVATAR_DIR}日志异常分析专家.png`,
+  'A股行情追踪专家': `${CLAW_AVATAR_DIR}金融风控分析师.png`,
+  '宏观经济专家': `${CLAW_AVATAR_DIR}高级数据分析师.png`,
+  '基金掘金师': `${CLAW_AVATAR_DIR}金融风控分析师.png`,
+  '个股诊断专家': `${CLAW_AVATAR_DIR}高级数据分析师.png`,
+  '自媒体热点猎手': `${CLAW_AVATAR_DIR}自媒体热点助手.png`,
+  '抖音运营策略师': `${CLAW_AVATAR_DIR}抖音运营.png`,
+  '小红书爆款操盘手': `${CLAW_AVATAR_DIR}小红书.png`,
+  '公众号内容助手': `${CLAW_AVATAR_DIR}公众号.png`,
+};
+
+function clawAvatar(name, fallback = '高级数据分析师.png') {
+  return CLAW_AGENT_AVATARS[name] || `${CLAW_AVATAR_DIR}${fallback}`;
+}
+
+const CLAW_XIAOTIAN_HOME = {
+  id: 'xiaotian',
+  name: '小天',
+  desc: '开箱即用，越用越强，7x24不断线，全设备可用的超级助理',
+  icon: './custom-assets/claw-flow/claw-avatar.png',
+};
+let activeClawHomeAgent = CLAW_XIAOTIAN_HOME;
 
 const CLAW_EXPERTS = [
   {
     id: 'planner',
     name: '学习规划师',
     desc: '梳理学期节奏，规划每阶段的学习重心与优先级',
-    icon: './custom-assets/claw-flow/agent-1.png',
+    icon: clawAvatar('学习规划师'),
   },
   {
     id: 'paper-reader',
     name: '论文速读导师',
     desc: '快速提炼论文核心论点与结构，省去逐字精读的时间',
-    icon: './custom-assets/claw-flow/agent-2.png',
+    icon: clawAvatar('论文速读导师'),
   },
   {
     id: 'material-master',
     name: '资料整理大师',
     desc: '课件、笔记、教材多源汇总，生成结构化知识清单',
-    icon: './custom-assets/claw-flow/agent-3.png',
+    icon: clawAvatar('资料整理大师'),
   },
   {
     id: 'exam-sprint',
     name: '考前冲刺哥',
     desc: '整合考点、梳理高频题型、生成冲刺复习计划',
-    icon: './custom-assets/claw-flow/agent-4.png',
+    icon: clawAvatar('考前冲刺哥'),
   },
   {
     id: 'language-tutor',
     name: '外语一对一私教',
     desc: '四六级专项突破，学术英文读写与口语表达陪练',
-    icon: './custom-assets/claw-flow/agent-5.png',
+    icon: clawAvatar('外语一对一私教'),
   },
   {
     id: 'paper-hunter',
     name: '论文猎手',
     desc: '梳理论文脉络，快速定位可用观点与参考方向',
-    icon: './custom-assets/claw-flow/agent-6.png',
+    icon: clawAvatar('论文猎手'),
   },
   {
     id: 'preview-officer',
     name: '预习官',
     desc: '课前生成预习卡片，提炼本节重点与预习问题',
-    icon: './custom-assets/claw-flow/agent-7.png',
+    icon: clawAvatar('预习官'),
   },
   {
     id: 'goal-coach',
     name: '目标拆解教练',
     desc: '把大目标拆成可执行的小任务，带您一步步落地',
-    icon: './custom-assets/claw-flow/agent-8.png',
+    icon: clawAvatar('目标拆解教练'),
   },
 ];
 
@@ -4155,7 +4200,7 @@ let CLAW_TASK_ITEMS = [
     id: 'stock-watch',
     title: 'A股实时动态监控',
     icon: '↻',
-    avatar: './custom-assets/claw-flow/task-avatar-1.svg',
+    avatar: clawAvatar('金融风控分析师'),
     enabled: true,
     desc:
       '每15分钟给我推送一下今天A股的实时动态。可以包括大盘异动及原因分析，领涨板块的情况等。可以重点关注科技、半导体、机器人板块。',
@@ -4166,7 +4211,7 @@ let CLAW_TASK_ITEMS = [
     id: 'mail-digest',
     title: '每日邮件总结',
     icon: '↻',
-    avatar: './custom-assets/claw-flow/task-avatar-2.svg',
+    avatar: clawAvatar('公众号内容助手'),
     enabled: true,
     desc:
       '每天18:00的时候，总结下我电脑里今天收到的邮件，主要是识别其中包含的重点信息，那些订阅的广告啊，验证码啊啥的都过滤掉。',
@@ -4177,7 +4222,7 @@ let CLAW_TASK_ITEMS = [
     id: 'tech-radar',
     title: '科技热点雷达',
     icon: '↻',
-    avatar: './custom-assets/claw-flow/task-avatar-3.svg',
+    avatar: clawAvatar('自媒体热点猎手'),
     enabled: false,
     desc:
       '每隔2小时，帮我扫一圈科技数码圈的热搜动态，平台只看微博热搜、抖音热榜、B站热门、知乎热榜。',
@@ -4188,7 +4233,7 @@ let CLAW_TASK_ITEMS = [
     id: 'mentor-mail',
     title: '给导师发项目进展邮件',
     icon: '✓',
-    avatar: './custom-assets/claw-flow/task-avatar-4.svg',
+    avatar: clawAvatar('高级项目经理'),
     enabled: true,
     desc:
       '明天（5月8号）早上10点，帮我发一封邮件给我的导师王教授，正文大致是项目进展说明，内容帮我优化得正式一些。',
@@ -4819,7 +4864,7 @@ function bindClawSkillMarketSort() {
 }
 
 function clawAgentIcon(name, fallbackIndex = 0) {
-  return CLAW_EXPERTS.find(item => item.name === name)?.icon || CLAW_EXPERTS[fallbackIndex % CLAW_EXPERTS.length].icon;
+  return CLAW_AGENT_AVATARS[name] || CLAW_EXPERTS.find(item => item.name === name)?.icon || CLAW_EXPERTS[fallbackIndex % CLAW_EXPERTS.length].icon;
 }
 
 const EXPERT_MARKET_TEAMS = [
@@ -4832,8 +4877,8 @@ const EXPERT_MARKET_TEAMS = [
     added: false,
     experts: [
       { name: '考前冲刺哥', desc: '整合考点、梳理高频题型、生成冲刺复习计划', icon: clawAgentIcon('考前冲刺哥', 3) },
-      { name: 'AI论文速读导师', desc: '梳理学期节奏，规划每阶段的学习重心与优先级', icon: clawAgentIcon('论文速读导师', 1) },
-      { name: '深夜解压大师', desc: '深夜陪伴：情绪疏导与倾听助眠', icon: clawAgentIcon('学习规划师', 0) },
+      { name: 'AI论文速读导师', desc: '梳理学期节奏，规划每阶段的学习重心与优先级', icon: clawAgentIcon('AI论文速读导师', 1) },
+      { name: '深夜解压大师', desc: '深夜陪伴：情绪疏导与倾听助眠', icon: clawAgentIcon('深夜解压大师', 0) },
       { name: '资料整理大师', desc: '课件、笔记、教材多源汇总，生成结构化知识清单', icon: clawAgentIcon('资料整理大师', 2) },
     ],
   },
@@ -4847,8 +4892,8 @@ const EXPERT_MARKET_TEAMS = [
     experts: [
       { name: '学习规划师', desc: '量身定制每日学习计划，跟着走就行', icon: clawAgentIcon('学习规划师', 0) },
       { name: '目标拆解教练', desc: '多国申请+选校定位+文书指导，圆梦名校', icon: clawAgentIcon('目标拆解教练', 7) },
-      { name: '留学规划顾问', desc: '多国申请+选校定位+文书指导，圆梦名校', icon: clawAgentIcon('论文猎手', 5) },
-      { name: '高考志愿填报顾问', desc: '院校匹配+专业推荐+分数线预测，不浪费分', icon: clawAgentIcon('学习规划师', 0) },
+      { name: '留学规划顾问', desc: '多国申请+选校定位+文书指导，圆梦名校', icon: clawAgentIcon('留学规划顾问', 5) },
+      { name: '高考志愿填报顾问', desc: '院校匹配+专业推荐+分数线预测，不浪费分', icon: clawAgentIcon('高考志愿填报顾问', 0) },
     ],
   },
   {
@@ -4862,14 +4907,14 @@ const EXPERT_MARKET_TEAMS = [
       {
         name: '跨境电商情报探长',
         desc: '7x24h全网热搜雷达，只推送你领域相关的精准选品',
-        icon: clawAgentIcon('学习规划师', 0),
+        icon: clawAgentIcon('跨境电商情报探长', 0),
         detail:
           '我是竞品雷达，一只24小时不眨眼的跨境电商情报探长。盯着竞品的价格、Listing、评论和上新的每一个风吹草动，是我的本能。数据就是我的眼睛，异常就是我的猎物。价格变动超5%日报汇总，超15%即时告警；差评暴增秒级响应；Listing改动每日对比。只做合规数据采集，情报归情报，决策归你。',
         skills: ['online-search', 'competitor-monitoring', 'price-tracker', 'amazon-competitor-analyzer'],
       },
-      { name: 'TikTok策略师', desc: '病毒式内容+算法优化，全球流量把抓', icon: clawAgentIcon('论文速读导师', 1) },
-      { name: '库存预测专家', desc: '需求预测+安全库存+大促备货，精准管库存', icon: clawAgentIcon('资料整理大师', 2) },
-      { name: 'PPC竞价策略师', desc: '关键词+出价+质量分优化，最大化广告ROI', icon: clawAgentIcon('论文猎手', 5) },
+      { name: 'TikTok策略师', desc: '病毒式内容+算法优化，全球流量把抓', icon: clawAgentIcon('TikTok策略师', 1) },
+      { name: '库存预测专家', desc: '需求预测+安全库存+大促备货，精准管库存', icon: clawAgentIcon('库存预测专家', 2) },
+      { name: 'PPC竞价策略师', desc: '关键词+出价+质量分优化，最大化广告ROI', icon: clawAgentIcon('PPC竞价策略师', 5) },
     ],
   },
   {
@@ -4880,10 +4925,10 @@ const EXPERT_MARKET_TEAMS = [
     category: '技术工程',
     added: false,
     experts: [
-      { name: '产品经理', desc: 'PRD+路线图+产品全生命周期，从0到1交付', icon: clawAgentIcon('考前冲刺哥', 3) },
-      { name: 'UI设计师', desc: '设计系统+组件库，高质量界面快速生成', icon: clawAgentIcon('学习规划师', 0) },
-      { name: '前端开发者', desc: '精通主流前端技术栈，帮你实现高质量界面', icon: clawAgentIcon('目标拆解教练', 7) },
-      { name: '后端架构师', desc: '微服务+分布式+高可用，后端架构全局把控', icon: clawAgentIcon('外语一对一私教', 4) },
+      { name: '产品经理', desc: 'PRD+路线图+产品全生命周期，从0到1交付', icon: clawAgentIcon('产品经理', 3) },
+      { name: 'UI设计师', desc: '设计系统+组件库，高质量界面快速生成', icon: clawAgentIcon('UI设计师', 0) },
+      { name: '前端开发者', desc: '精通主流前端技术栈，帮你实现高质量界面', icon: clawAgentIcon('前端开发者', 7) },
+      { name: '后端架构师', desc: '微服务+分布式+高可用，后端架构全局把控', icon: clawAgentIcon('后端架构师', 4) },
     ],
   },
   {
@@ -4894,10 +4939,10 @@ const EXPERT_MARKET_TEAMS = [
     category: '金融',
     added: false,
     experts: [
-      { name: 'A股行情追踪专家', desc: '7x24小时盯盘，异动第一时间送达', icon: clawAgentIcon('论文速读导师', 1) },
-      { name: '宏观经济专家', desc: '利率变了？政策又吹了？我帮你拆明白', icon: clawAgentIcon('考前冲刺哥', 3) },
-      { name: '基金掘金师', desc: '3000+只基金我帮你翻，只挑真正能拿住的', icon: clawAgentIcon('资料整理大师', 2) },
-      { name: '个股诊断专家', desc: '深度扫描，看透每只股的价值与风险', icon: clawAgentIcon('目标拆解教练', 7) },
+      { name: 'A股行情追踪专家', desc: '7x24小时盯盘，异动第一时间送达', icon: clawAgentIcon('A股行情追踪专家', 1) },
+      { name: '宏观经济专家', desc: '利率变了？政策又吹了？我帮你拆明白', icon: clawAgentIcon('宏观经济专家', 3) },
+      { name: '基金掘金师', desc: '3000+只基金我帮你翻，只挑真正能拿住的', icon: clawAgentIcon('基金掘金师', 2) },
+      { name: '个股诊断专家', desc: '深度扫描，看透每只股的价值与风险', icon: clawAgentIcon('个股诊断专家', 7) },
     ],
   },
   {
@@ -4908,10 +4953,10 @@ const EXPERT_MARKET_TEAMS = [
     category: '营销增长',
     added: false,
     experts: [
-      { name: '自媒体热点猎手', desc: '7x24h全网热搜雷达，只推送你领域相关的精准选题弹药', icon: clawAgentIcon('学习规划师', 0) },
-      { name: '抖音运营策略师', desc: '让视频上热榜不靠玄学', icon: clawAgentIcon('论文猎手', 5) },
-      { name: '小红书爆款操盘手', desc: '从选题到爆款全流程服务，你负责拍我负责火', icon: clawAgentIcon('预习官', 6) },
-      { name: '公众号内容助手', desc: '给主题即出稿，策划到排版一步到位', icon: clawAgentIcon('外语一对一私教', 4) },
+      { name: '自媒体热点猎手', desc: '7x24h全网热搜雷达，只推送你领域相关的精准选题弹药', icon: clawAgentIcon('自媒体热点猎手', 0) },
+      { name: '抖音运营策略师', desc: '让视频上热榜不靠玄学', icon: clawAgentIcon('抖音运营策略师', 5) },
+      { name: '小红书爆款操盘手', desc: '从选题到爆款全流程服务，你负责拍我负责火', icon: clawAgentIcon('小红书爆款操盘手', 6) },
+      { name: '公众号内容助手', desc: '给主题即出稿，策划到排版一步到位', icon: clawAgentIcon('公众号内容助手', 4) },
     ],
   },
 ];
@@ -4978,11 +5023,16 @@ function setClawConfigSection(section) {
   document.querySelectorAll('.claw-config-sidebar [data-claw-section]').forEach(item => {
     item.classList.toggle('is-active', item.dataset.clawSection === clawConfigSection);
   });
+  renderClawAddedAgentList();
 
   closeClawSkillDetail();
   closeExpertDetail();
   closeTaskDeleteModal();
   activeTaskMenuId = null;
+
+  if (clawConfigSection === 'xiaotian') {
+    renderClawAgentHome();
+  }
 
   if (clawConfigSection === 'expert-market') {
     renderExpertMarket();
@@ -5107,17 +5157,40 @@ function updateClawSelectionUI() {
 
 function getAddedClawSidebarAgents() {
   const byName = new Map();
+  let sidebarIndex = 0;
   if (clawExpertsAdded) {
     CLAW_EXPERTS.forEach(item => {
-      if (clawSelectedExperts.has(item.id)) byName.set(item.name, item);
+      if (clawSelectedExperts.has(item.id)) {
+        byName.set(item.name, { ...item, addedAt: item.addedAt || 1, sidebarIndex: sidebarIndex++ });
+      }
     });
   }
   EXPERT_MARKET_TEAMS.forEach(team => {
     team.experts.forEach(expert => {
-      if (expert.added) byName.set(expert.name, expert);
+      if (expert.added) {
+        byName.set(expert.name, { ...expert, addedAt: expert.addedAt || 2, sidebarIndex: sidebarIndex++ });
+      }
     });
   });
-  return [...byName.values()];
+  return [...byName.values()].sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0) || a.sidebarIndex - b.sidebarIndex);
+}
+
+function renderClawAgentHome() {
+  const agent = activeClawHomeAgent || CLAW_XIAOTIAN_HOME;
+  const avatar = document.getElementById('claw-agent-home-avatar');
+  const title = document.getElementById('claw-agent-home-title');
+  const desc = document.getElementById('claw-agent-home-desc');
+  if (avatar) {
+    avatar.src = agent.icon || CLAW_XIAOTIAN_HOME.icon;
+    avatar.alt = agent.name || '';
+  }
+  if (title) title.textContent = `Hi，我是${agent.name || '小天'}`;
+  if (desc) desc.textContent = agent.desc || CLAW_XIAOTIAN_HOME.desc;
+}
+
+function openClawAgentHome(agent) {
+  activeClawHomeAgent = agent || CLAW_XIAOTIAN_HOME;
+  setClawConfigSection('xiaotian');
 }
 
 function renderClawAddedAgentList() {
@@ -5127,7 +5200,7 @@ function renderClawAddedAgentList() {
   document.querySelector('.claw-config-sidebar')?.classList.toggle('has-added-agents', agents.length > 0);
   list.innerHTML = agents
     .map(agent => `
-      <button class="claw-added-agent-item" type="button" data-agent-name="${escapeHtml(agent.name)}">
+      <button class="claw-added-agent-item${clawConfigSection === 'xiaotian' && activeClawHomeAgent?.name === agent.name ? ' is-active' : ''}" type="button" data-agent-name="${escapeHtml(agent.name)}">
         <img src="${agent.icon}" alt="" />
         <span>
           <strong>${escapeHtml(agent.name)}</strong>
@@ -5138,8 +5211,9 @@ function renderClawAddedAgentList() {
     .join('');
   list.querySelectorAll('.claw-added-agent-item').forEach(button => {
     button.addEventListener('click', () => {
-      const found = findMarketExpertByName(button.dataset.agentName);
-      if (found) openExpertDetail(found.team.id, found.expert.name);
+      const name = button.dataset.agentName;
+      const agent = agents.find(item => item.name === name) || findMarketExpertByName(name)?.expert;
+      if (agent) openClawAgentHome(agent);
     });
   });
 }
@@ -5516,6 +5590,7 @@ function addSingleMarketExpert(teamId, expertName) {
   if (!found || found.expert.added) return;
 
   found.expert.added = true;
+  found.expert.addedAt = ++clawAddedSequence;
   syncExpertPersonState(teamId, expertName);
   if (found.team.experts.every(expert => expert.added)) {
     found.team.added = true;
@@ -5583,8 +5658,10 @@ function startExpertTeamAdd(teamId) {
 
   setTimeout(() => {
     team.added = true;
+    const addedAt = ++clawAddedSequence;
     team.experts.forEach(expert => {
       expert.added = true;
+      expert.addedAt = addedAt;
       syncExpertPersonState(team.id, expert.name);
     });
     syncExpertTeamButton(team);
@@ -5600,6 +5677,9 @@ function finishClawExpertSetup(queryText, options = {}) {
   }
 
   clawExpertsAdded = true;
+  CLAW_EXPERTS.forEach(item => {
+    if (clawSelectedExperts.has(item.id) && !item.addedAt) item.addedAt = 1;
+  });
   updateClawSelectionUI();
 
   const article = document.querySelector('#claw-config-page .claw-dialog');
@@ -5659,6 +5739,7 @@ document.querySelectorAll('.claw-config-sidebar [data-claw-section]').forEach(it
   const activate = () => {
     const section = item.dataset.clawSection;
     if (section === 'expert-market' || section === 'skill' || section === 'config' || section === 'task' || section === 'subscription' || section === 'xiaotian') {
+      if (section === 'xiaotian') activeClawHomeAgent = CLAW_XIAOTIAN_HOME;
       setClawConfigSection(section);
     }
   };
@@ -5704,6 +5785,7 @@ document.getElementById('expert-detail-add')?.addEventListener('click', () => {
   if (!activeExpertMarketItem) return;
   const alreadyAdded = activeExpertMarketItem.expert.added || isMarketTeamFullyAdded(activeExpertMarketItem.team);
   if (alreadyAdded) {
+    openClawAgentHome(activeExpertMarketItem.expert);
     closeExpertDetail();
     return;
   }

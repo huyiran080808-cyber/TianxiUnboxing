@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=94" />
+    <link rel="stylesheet" href="./styles.css?v=95" />
   </head>
   <body>
     <main class="app-shell">
@@ -191,7 +191,7 @@
                   <img src="./custom-assets/claw-flow/claw-avatar.png" alt="" />
                   <span><strong>小天</strong><small>开箱即用，越用越强，7x24...</small></span>
                 </button>
-                <span class="claw-config-entry is-active" data-claw-section="config" role="button" tabindex="0"><img src="./custom-assets/claw-flow/nav-config.svg" alt="" />帮我解读这个文件</span>
+                <span class="claw-config-entry is-active" data-claw-section="config" role="button" tabindex="0"><img src="./custom-assets/claw-flow/nav-config.svg" alt="" />学霸后援团配置</span>
                 <div class="claw-sidebar-work-divider" aria-hidden="true"></div>
                 <div class="claw-added-agent-list" id="claw-added-agent-list" aria-label="已添加智能体"></div>
               </div>
@@ -249,6 +249,7 @@
                   </div>
                   <div class="composer-toolbar">
                     <div class="toolbar-left">
+                      <div class="pill-select pill-flagship-select" aria-label="旗舰模式"><span class="pill-flagship-icon" aria-hidden="true"></span><span>旗舰模式</span></div>
                       <div class="pill-select pill-art-select" aria-label="技能"><img src="./custom-assets/claw-flow/skill-button.svg" alt="" /></div>
                       <div class="pill-select pill-art-select" aria-label="提及"><img src="./custom-assets/claw-flow/mention-button.svg" alt="" /></div>
                     </div>
@@ -275,7 +276,11 @@
                 <span class="tip-icon-btn"><img src="./figma-assets/31a5484d-800b-45f9-9edd-88087b498f6c.svg" alt="" /></span>
               </div>
               <div class="claw-xiaotian-content">
-                <img class="claw-xiaotian-hero" src="./custom-assets/claw-flow/xiaotian-wave.svg" alt="小天" />
+                <div class="claw-agent-home-hero">
+                  <img class="claw-agent-home-avatar" id="claw-agent-home-avatar" src="./custom-assets/claw-flow/claw-avatar.png" alt="" />
+                  <h1 id="claw-agent-home-title">Hi，我是小天</h1>
+                  <p id="claw-agent-home-desc">开箱即用，越用越强，7x24不断线，全设备可用的超级助理</p>
+                </div>
                 <div class="claw-xiaotian-quick-row" aria-label="快捷入口">
                   <button type="button">
                     <span class="claw-xiaotian-quick-icon">+</span>
@@ -299,7 +304,7 @@
                   </button>
                 </div>
                 <button class="claw-xiaotian-input" type="button" aria-label="输入任务描述或提问任何问题">
-                  <img src="./custom-assets/claw-flow/xiaotian-input.svg" alt="" />
+                  <img src="./custom-assets/claw-flow/flagship-mode.svg" alt="" />
                 </button>
               </div>
             </div>
@@ -1800,6 +1805,6 @@
       </section>
     </main>
 
-    <script src="./script.js?v=80"></script>
+    <script src="./script.js?v=81"></script>
   </body>
 </html>
