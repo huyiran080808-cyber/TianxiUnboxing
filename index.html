@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=95" />
+    <link rel="stylesheet" href="./styles.css?v=96" />
   </head>
   <body>
     <main class="app-shell">
@@ -228,6 +228,7 @@
                       <span>全选</span>
                     </button>
                     <span class="agent-selected-count" id="agent-selected-count">已选 4/8 位专家</span>
+                    <button class="agent-later-button" id="agent-later-button" type="button">稍后添加</button>
                     <button class="agent-add-button" id="agent-add-button" type="button">一键添加</button>
                   </div>
 
@@ -303,9 +304,38 @@
                     <small>让智能体学会你的技能</small>
                   </button>
                 </div>
-                <button class="claw-xiaotian-input" type="button" aria-label="输入任务描述或提问任何问题">
-                  <img src="./custom-assets/claw-flow/flagship-mode.svg" alt="" />
-                </button>
+                <form class="claw-agent-home-composer" aria-label="输入任务描述或提问任何问题">
+                  <div class="composer-glow"></div>
+                  <div class="composer-card">
+                    <div class="composer-input-wrap">
+                      <div
+                        class="prompt-editor"
+                        contenteditable="true"
+                        role="textbox"
+                        aria-multiline="true"
+                        data-placeholder="发消息或输入“/”选择技能"
+                      ></div>
+                    </div>
+                    <div class="composer-toolbar">
+                      <div class="toolbar-left">
+                        <div class="pill-select pill-flagship-select" aria-label="旗舰模式"><span class="pill-flagship-icon" aria-hidden="true"></span><span>旗舰模式</span></div>
+                        <div class="pill-select pill-art-select" aria-label="技能"><img src="./custom-assets/claw-flow/skill-button.svg" alt="" /></div>
+                        <div class="pill-select pill-art-select" aria-label="提及"><img src="./custom-assets/claw-flow/mention-button.svg" alt="" /></div>
+                      </div>
+                      <div class="toolbar-right">
+                        <div class="tool-group-wrap">
+                          <div class="tool-group">
+                            <div class="tool-icon"><img src="./文件.svg" alt="" /></div>
+                            <div class="tool-icon"><img src="./图片.svg" alt="" /></div>
+                            <div class="tool-icon"><img src="./语音.svg" alt="" /></div>
+                          </div>
+                          <span class="toolbar-divider"></span>
+                        </div>
+                        <button class="send-button" type="button"><img src="./send.svg" alt="" /></button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
               </div>
             </div>
 
@@ -1805,6 +1835,6 @@
       </section>
     </main>
 
-    <script src="./script.js?v=81"></script>
+    <script src="./script.js?v=82"></script>
   </body>
 </html>

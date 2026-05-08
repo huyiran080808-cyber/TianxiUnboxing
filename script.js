@@ -5177,14 +5177,17 @@ function getAddedClawSidebarAgents() {
 
 function renderClawAgentHome() {
   const agent = activeClawHomeAgent || CLAW_XIAOTIAN_HOME;
+  const main = document.getElementById('claw-xiaotian-main');
   const avatar = document.getElementById('claw-agent-home-avatar');
   const title = document.getElementById('claw-agent-home-title');
   const desc = document.getElementById('claw-agent-home-desc');
+  const isXiaotian = (agent.id || agent.name) === (CLAW_XIAOTIAN_HOME.id || CLAW_XIAOTIAN_HOME.name);
+  main?.classList.toggle('is-custom-agent-home', !isXiaotian);
   if (avatar) {
     avatar.src = agent.icon || CLAW_XIAOTIAN_HOME.icon;
     avatar.alt = agent.name || '';
   }
-  if (title) title.textContent = `Hi，我是${agent.name || '小天'}`;
+  if (title) title.innerHTML = `Hi，我是<span class="claw-agent-name-underline">${escapeHtml(agent.name || '小天')}</span>`;
   if (desc) desc.textContent = agent.desc || CLAW_XIAOTIAN_HOME.desc;
 }
 
@@ -5809,11 +5812,20 @@ document.getElementById('agent-add-button')?.addEventListener('click', e => {
   e.preventDefault();
   handleClawAddFromButton();
 });
+document.getElementById('agent-later-button')?.addEventListener('click', e => {
+  e.preventDefault();
+});
 
 document.querySelector('#claw-config-page .claw-fixed-composer .send-button')?.addEventListener('click', handleClawComposerSend);
 document.querySelector('#claw-config-page .claw-fixed-composer')?.addEventListener('submit', e => {
   e.preventDefault();
   handleClawComposerSend();
+});
+document.querySelector('#claw-config-page .claw-agent-home-composer')?.addEventListener('submit', e => {
+  e.preventDefault();
+});
+document.querySelector('#claw-config-page .claw-agent-home-composer .send-button')?.addEventListener('click', e => {
+  e.preventDefault();
 });
 document.querySelector('#claw-config-page .claw-fixed-composer .prompt-editor')?.addEventListener('keydown', e => {
   if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
