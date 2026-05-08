@@ -1511,6 +1511,23 @@ textarea {
   box-shadow: 0 0.5px 0 rgba(0, 0, 0, 0.05);
 }
 
+.claw-flow-loading #tab-claw,
+.claw-flow-config #tab-claw {
+  width: 201px;
+  max-width: 201px;
+  height: 34px;
+  flex: 0 0 201px;
+  padding: 0;
+  border: 0;
+  background: url("./custom-assets/claw-flow/tab-bar-btn.svg") center / 201px 34px no-repeat;
+  box-shadow: none;
+}
+
+.claw-flow-loading #tab-claw > *,
+.claw-flow-config #tab-claw > * {
+  opacity: 0;
+}
+
 .claw-flow-loading #tab-claw .tab-chip-icon-claw img,
 .claw-flow-config #tab-claw .tab-chip-icon-claw img {
   opacity: 0;
@@ -2401,27 +2418,28 @@ textarea {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: rgba(255, 255, 255, 0.48);
-  font-size: 14px;
+  color: rgba(255, 255, 255, 0.32);
+  font-size: 12px;
+  line-height: 18px;
   font-weight: 400;
   cursor: pointer;
 }
 
 .claw-config-entry.is-active {
   background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.32);
 }
 
 .claw-config-entry img {
   width: 22px;
   height: 22px;
-  opacity: 0.48;
+  opacity: 0.32;
   object-fit: contain;
   filter: brightness(0) invert(1);
 }
 
 .claw-config-entry.is-active img {
-  opacity: 0.8;
+  opacity: 0.32;
   filter: brightness(0) invert(1);
 }
 
@@ -2559,7 +2577,7 @@ textarea {
 }
 
 .claw-added-agent-item.is-active small {
-  color: rgba(255, 255, 255, 0.58);
+  color: rgba(255, 255, 255, 0.32);
 }
 
 .claw-config-nav {
@@ -2819,9 +2837,9 @@ textarea {
 
 .claw-xiaotian-content {
   position: relative;
-  width: 780px;
+  width: auto;
   height: 618px;
-  margin: 80px auto 0;
+  margin: 80px 80px 0;
 }
 
 .claw-xiaotian-hero {
@@ -2895,10 +2913,11 @@ textarea {
 .claw-xiaotian-quick-row {
   position: absolute;
   top: 208px;
-  left: 0;
+  left: 50%;
   width: 779px;
   height: 150px;
   margin: 0;
+  transform: translateX(-50%);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
@@ -2958,22 +2977,27 @@ textarea {
   display: none;
 }
 
+.claw-xiaotian-main.is-custom-agent-home .claw-agent-home-hero {
+  top: 96px;
+}
+
 .claw-agent-home-composer {
   position: absolute;
   top: 482px;
-  left: 50%;
-  width: 776px;
-  max-width: calc(100% - 160px);
+  left: 0;
+  right: 0;
+  width: auto;
+  max-width: none;
   margin: 0;
   border: 0;
   padding: 0;
   background: transparent;
   cursor: text;
-  transform: translateX(-50%);
+  transform: none;
 }
 
 .claw-agent-home-composer .composer-card {
-  width: 776px;
+  width: 100%;
   height: 136px;
   max-width: 100%;
   gap: 0;
@@ -5715,11 +5739,12 @@ textarea {
 
 .claw-fixed-composer {
   position: absolute;
-  left: 50%;
+  left: 80px;
+  right: 80px;
   bottom: 28px;
-  width: 776px;
-  max-width: calc(100% - 160px);
-  transform: translateX(-50%);
+  width: auto;
+  max-width: none;
+  transform: none;
   z-index: 5;
 }
 
@@ -5735,7 +5760,7 @@ textarea {
 }
 
 .claw-fixed-composer .composer-card {
-  width: 776px;
+  width: 100%;
   height: 136px;
   max-width: 100%;
   gap: 0;
