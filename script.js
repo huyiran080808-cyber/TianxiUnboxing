@@ -4667,7 +4667,7 @@ function openClawSkillDetail(skillId) {
         <div class="claw-skill-howto-row-head">
           <span class="claw-skill-howto-row-title">${escapeHtml(row.title)}</span>
           <button type="button" class="claw-skill-howto-copy" aria-label="复制示例提示">
-            <span class="claw-skill-howto-copy-icon" aria-hidden="true"></span>
+            <img class="claw-skill-howto-copy-icon" src="./custom-assets/claw-flow/copy-icon.svg" alt="" aria-hidden="true" />
           </button>
         </div>
         <p class="claw-skill-howto-row-desc">${escapeHtml(row.copyText || row.desc || '')}</p>
