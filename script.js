@@ -4111,40 +4111,50 @@ let clawExpertsAdded = false;
 let clawIntroAnimationStarted = false;
 let clawAddedSequence = 1;
 
-const CLAW_AVATAR_DIR = './custom-assets/claw-flow/avatars/';
+const CLAW_AVATAR_DIR = './custom-assets/claw-flow/agent-avatars/';
+const CLAW_AGENT_AVATAR_FILES = Array.from({ length: 24 }, (_, index) => {
+  const avatarNumber = String(index + 1).padStart(2, '0');
+  return `${CLAW_AVATAR_DIR}avatar-${avatarNumber}.png`;
+});
 const CLAW_AGENT_AVATARS = {
-  '学习规划师': `${CLAW_AVATAR_DIR}高级项目经理.png`,
-  '论文速读导师': `${CLAW_AVATAR_DIR}高级数据分析师.png`,
-  'AI论文速读导师': `${CLAW_AVATAR_DIR}高级数据分析师.png`,
-  '资料整理大师': `${CLAW_AVATAR_DIR}制度文件撰写专家.png`,
-  '考前冲刺哥': `${CLAW_AVATAR_DIR}私人健身教练.png`,
-  '外语一对一私教': `${CLAW_AVATAR_DIR}外语一对一老师.png`,
-  '论文猎手': `${CLAW_AVATAR_DIR}腾讯问卷设计专家.png`,
-  '预习官': `${CLAW_AVATAR_DIR}日志异常分析专家.png`,
-  '目标拆解教练': `${CLAW_AVATAR_DIR}目标拆解教练.png`,
-  '深夜解压大师': `${CLAW_AVATAR_DIR}深夜解压大师.png`,
-  '留学规划顾问': `${CLAW_AVATAR_DIR}留学规划顾问.png`,
-  '高考志愿填报顾问': `${CLAW_AVATAR_DIR}高考志愿填报顾问.png`,
-  '跨境电商情报探长': `${CLAW_AVATAR_DIR}跨境社媒营销官.png`,
-  'TikTok策略师': `${CLAW_AVATAR_DIR}抖音运营.png`,
-  '库存预测专家': `${CLAW_AVATAR_DIR}高级数据分析师.png`,
-  'PPC竞价策略师': `${CLAW_AVATAR_DIR}金融风控分析师.png`,
-  '产品经理': `${CLAW_AVATAR_DIR}高级项目经理.png`,
-  'UI设计师': `${CLAW_AVATAR_DIR}种草图文设计师.png`,
-  '前端开发者': `${CLAW_AVATAR_DIR}提示词工程师.png`,
-  '后端架构师': `${CLAW_AVATAR_DIR}日志异常分析专家.png`,
-  'A股行情追踪专家': `${CLAW_AVATAR_DIR}金融风控分析师.png`,
-  '宏观经济专家': `${CLAW_AVATAR_DIR}高级数据分析师.png`,
-  '基金掘金师': `${CLAW_AVATAR_DIR}金融风控分析师.png`,
-  '个股诊断专家': `${CLAW_AVATAR_DIR}高级数据分析师.png`,
-  '自媒体热点猎手': `${CLAW_AVATAR_DIR}自媒体热点助手.png`,
-  '抖音运营策略师': `${CLAW_AVATAR_DIR}抖音运营.png`,
-  '小红书爆款操盘手': `${CLAW_AVATAR_DIR}小红书.png`,
-  '公众号内容助手': `${CLAW_AVATAR_DIR}公众号.png`,
+  '学习规划师': CLAW_AGENT_AVATAR_FILES[0],
+  '论文速读导师': CLAW_AGENT_AVATAR_FILES[1],
+  'AI论文速读导师': CLAW_AGENT_AVATAR_FILES[1],
+  '资料整理大师': CLAW_AGENT_AVATAR_FILES[2],
+  '考前冲刺哥': CLAW_AGENT_AVATAR_FILES[3],
+  '外语一对一私教': CLAW_AGENT_AVATAR_FILES[4],
+  '论文猎手': CLAW_AGENT_AVATAR_FILES[5],
+  '预习官': CLAW_AGENT_AVATAR_FILES[6],
+  '目标拆解教练': CLAW_AGENT_AVATAR_FILES[7],
+  '深夜解压大师': CLAW_AGENT_AVATAR_FILES[8],
+  '留学规划顾问': CLAW_AGENT_AVATAR_FILES[9],
+  '高考志愿填报顾问': CLAW_AGENT_AVATAR_FILES[10],
+  '跨境电商情报探长': CLAW_AGENT_AVATAR_FILES[11],
+  'TikTok策略师': CLAW_AGENT_AVATAR_FILES[12],
+  '库存预测专家': CLAW_AGENT_AVATAR_FILES[13],
+  'PPC竞价策略师': CLAW_AGENT_AVATAR_FILES[14],
+  '产品经理': CLAW_AGENT_AVATAR_FILES[15],
+  'UI设计师': CLAW_AGENT_AVATAR_FILES[16],
+  '前端开发者': CLAW_AGENT_AVATAR_FILES[17],
+  '后端架构师': CLAW_AGENT_AVATAR_FILES[18],
+  'A股行情追踪专家': CLAW_AGENT_AVATAR_FILES[19],
+  '宏观经济专家': CLAW_AGENT_AVATAR_FILES[20],
+  '基金掘金师': CLAW_AGENT_AVATAR_FILES[21],
+  '个股诊断专家': CLAW_AGENT_AVATAR_FILES[22],
+  '自媒体热点猎手': CLAW_AGENT_AVATAR_FILES[23],
+  '抖音运营策略师': CLAW_AGENT_AVATAR_FILES[4],
+  '小红书爆款操盘手': CLAW_AGENT_AVATAR_FILES[10],
+  '公众号内容助手': CLAW_AGENT_AVATAR_FILES[16],
+  '高级项目经理': CLAW_AGENT_AVATAR_FILES[15],
+  '高级数据分析师': CLAW_AGENT_AVATAR_FILES[20],
+  '金融风控分析师': CLAW_AGENT_AVATAR_FILES[14],
 };
 
-function clawAvatar(name, fallback = '高级数据分析师.png') {
-  return CLAW_AGENT_AVATARS[name] || `${CLAW_AVATAR_DIR}${fallback}`;
+function clawAvatar(name, fallbackIndex = 0) {
+  if (CLAW_AGENT_AVATARS[name]) return CLAW_AGENT_AVATARS[name];
+  const text = String(name || '');
+  const hash = [...text].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  return CLAW_AGENT_AVATAR_FILES[(hash || fallbackIndex) % CLAW_AGENT_AVATAR_FILES.length];
 }
 
 const CLAW_XIAOTIAN_HOME = {

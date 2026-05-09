@@ -6029,12 +6029,12 @@ textarea {
 }
 
 .claw-composer-popover-manage img {
-  width: 32px;
-  height: 32px;
+  width: 16px;
+  height: 16px;
   flex: 0 0 auto;
-  border-radius: 8px;
+  border-radius: 0;
   object-fit: cover;
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent;
 }
 
 .claw-composer-popover-manage span {
@@ -7147,9 +7147,9 @@ textarea {
 }
 
 .choose-shrimp-confirm:disabled {
-  background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.86);
+  background: transparent url("./custom-assets/claw-flow/confirm-disabled.svg") center / 100% 100% no-repeat;
+  border-color: transparent;
+  color: transparent;
   cursor: not-allowed;
 }
 
