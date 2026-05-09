@@ -4660,7 +4660,7 @@ function openClawSkillDetail(skillId) {
             <span class="claw-skill-howto-copy-icon" aria-hidden="true"></span>
           </button>
         </div>
-        <p class="claw-skill-howto-row-desc">${escapeHtml(row.desc)}</p>
+        <p class="claw-skill-howto-row-desc">${escapeHtml(row.copyText || row.desc || '')}</p>
       </div>`
       )
       .join('');
@@ -4680,6 +4680,30 @@ function openClawSkillDetail(skillId) {
 
   modal.hidden = false;
   modal.setAttribute('aria-hidden', 'false');
+}
+
+let clawSkillSortMode = 'recent';
+
+function parseClawSkillCount(value) {
+  const text = String(value || '').trim().toLowerCase();
+  const num = parseFloat(text.replace(/[^\d.]/g, ''));
+  if (Number.isNaN(num)) return 0;
+  return text.includes('k') ? num * 1000 : num;
+}
+
+function getClawSkillTimestamp(item) {
+  const date = item.detail?.meta?.updated || '';
+  const time = Date.parse(String(date).replace(/\./g, '-'));
+  return Number.isNaN(time) ? 0 : time;
+}
+
+function getSortedClawSkills(items = CLAW_SKILL_PLAZA_ITEMS) {
+  return [...items].sort((a, b) => {
+    if (clawSkillSortMode === 'count') {
+      return parseClawSkillCount(b.count || b.detail?.meta?.count) - parseClawSkillCount(a.count || a.detail?.meta?.count);
+    }
+    return getClawSkillTimestamp(b) - getClawSkillTimestamp(a);
+  });
 }
 
 function bindClawSkillCategoryTabs() {
@@ -4810,7 +4834,7 @@ function setClawSkillSearchResults(query) {
 function resetClawSkillSearchResults() {
   const main = document.getElementById('claw-skill-market-main');
   main?.classList.remove('is-search-results');
-  renderClawSkillCards(CLAW_SKILL_PLAZA_ITEMS);
+  renderClawSkillCards(getSortedClawSkills());
 }
 
 function bindClawSkillMarketSearch() {
@@ -4865,7 +4889,7 @@ function bindClawSkillMarketSearch() {
 function renderClawSkillPlaza() {
   const main = document.getElementById('claw-skill-market-main');
   main?.classList.remove('is-search-results');
-  renderClawSkillCards(CLAW_SKILL_PLAZA_ITEMS);
+  renderClawSkillCards(getSortedClawSkills());
   bindClawSkillCategoryTabs();
   bindClawSkillMarketSort();
   bindClawSkillMarketSearch();
@@ -4879,6 +4903,8 @@ function bindClawSkillMarketSort() {
     btn.addEventListener('click', () => {
       sort.querySelectorAll('.claw-skill-sort-btn').forEach(b => b.classList.remove('is-active'));
       btn.classList.add('is-active');
+      clawSkillSortMode = btn.textContent.includes('添加') ? 'count' : 'recent';
+      renderClawSkillCards(getSortedClawSkills());
     });
   });
 }
@@ -5343,7 +5369,7 @@ function openClawComposerPopover(type, trigger) {
         </button>
       `).join('')}
     </div>
-    ${isSkill ? '<button class="claw-composer-popover-manage" type="button">管理技能</button>' : ''}
+    ${isSkill ? '<button class="claw-composer-popover-manage" type="button"><img src="./custom-assets/claw-flow/manage-skill-icon.svg" alt="" /><span>管理技能</span></button>' : ''}
   `;
 
   popover.querySelectorAll('.claw-composer-popover-item').forEach(button => {
