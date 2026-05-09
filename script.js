@@ -1169,6 +1169,8 @@ bindSkillsDetailModal();
 // ── Choose Shrimp Modal + success toast (Figma 1966:33662 / 1966:39470) ──
 let chooseShrimpSelectedIds = new Set();
 let toastTimer = null;
+let chooseShrimpConfirmHandler = null;
+let chooseShrimpIsMulti = true;
 
 function collectShrimpsForChooseModal() {
   const result = [];
@@ -1190,14 +1192,20 @@ function collectShrimpsForChooseModal() {
   return result;
 }
 
-function openChooseShrimpModal() {
+function openChooseShrimpModal(options = {}) {
   const overlay = document.getElementById('choose-shrimp-overlay');
+  const modal = overlay?.querySelector('.choose-shrimp-modal');
+  const title = document.querySelector('.choose-shrimp-title');
   const list = document.getElementById('choose-shrimp-list');
   const confirm = document.getElementById('choose-shrimp-confirm');
   const selectAll = document.getElementById('choose-shrimp-selectall');
   if (!overlay || !list || !confirm) return;
 
-  const shrimps = collectShrimpsForChooseModal();
+  const shrimps = options.items || collectShrimpsForChooseModal();
+  chooseShrimpConfirmHandler = typeof options.onConfirm === 'function' ? options.onConfirm : null;
+  chooseShrimpIsMulti = options.multi !== false;
+  if (title) title.textContent = options.title || '添加到你的虾';
+  modal?.classList.toggle('is-single', !chooseShrimpIsMulti);
   // Default: no selection.
   chooseShrimpSelectedIds = new Set();
   confirm.disabled = true;
@@ -1280,8 +1288,12 @@ function bindChooseShrimpModal() {
     const item = e.target?.closest?.('.choose-shrimp-item');
     if (!item) return;
     const id = item.getAttribute('data-id') || '';
-    if (chooseShrimpSelectedIds.has(id)) chooseShrimpSelectedIds.delete(id);
-    else chooseShrimpSelectedIds.add(id);
+    if (chooseShrimpIsMulti) {
+      if (chooseShrimpSelectedIds.has(id)) chooseShrimpSelectedIds.delete(id);
+      else chooseShrimpSelectedIds.add(id);
+    } else {
+      chooseShrimpSelectedIds = new Set([id]);
+    }
 
     list.querySelectorAll('.choose-shrimp-item').forEach(btn => {
       const bid = btn.getAttribute('data-id') || '';
@@ -1328,6 +1340,14 @@ function bindChooseShrimpModal() {
   // Confirm -> close -> toast -> update "已添加到 X 只虾"
   btnConfirm.addEventListener('click', () => {
     if (chooseShrimpSelectedIds.size === 0) return;
+    if (chooseShrimpConfirmHandler) {
+      const ids = [...chooseShrimpSelectedIds];
+      const handled = chooseShrimpConfirmHandler(ids);
+      closeChooseShrimpModal();
+      chooseShrimpConfirmHandler = null;
+      if (handled !== false) showAddSuccessToast();
+      return;
+    }
     closeChooseShrimpModal();
     closeSkillsDetailModal();
     navigateTo('skills-market');
@@ -5236,8 +5256,8 @@ function getClawComposerEditor(form) {
 function getClawComposerSkills() {
   return CLAW_SKILL_PLAZA_ITEMS.map(item => ({
     id: item.id,
-    name: item.subtitle || item.slug,
-    desc: item.slug || item.desc || '',
+    name: item.slug || item.subtitle,
+    desc: item.subtitle || item.desc || '',
     icon: item.icon,
     fill: item.subtitle || item.slug,
   }));
@@ -5340,7 +5360,11 @@ function openClawComposerPopover(type, trigger) {
   });
 
   positionClawComposerPopover(popover, trigger);
-  popover.style.visibility = 'visible';
+  requestAnimationFrame(() => {
+    if (!clawComposerPopover) return;
+    positionClawComposerPopover(popover, trigger);
+    popover.style.visibility = 'visible';
+  });
 }
 
 function scrollClawDialogToBottom() {
@@ -5448,6 +5472,128 @@ function getClawSelectedExpertNames() {
   return CLAW_EXPERTS
     .filter(item => clawSelectedExperts.has(item.id))
     .map(item => item.name);
+}
+
+function getClawSkillChooseAgents() {
+  const agents = getAddedClawSidebarAgents();
+  const source = agents.length ? agents : [CLAW_XIAOTIAN_HOME];
+  return source.map((agent, index) => ({
+    id: agent.id || `claw-agent-${index}`,
+    name: agent.name || '小天',
+    desc: agent.desc || '',
+    avatar: agent.icon || CLAW_XIAOTIAN_HOME.icon,
+    bgStyle: '',
+  }));
+}
+
+let clawSkillToastTimer = null;
+let clawSkillAgentOverlay = null;
+let clawSkillAgentSelectedId = '';
+
+function showClawSkillAddToast() {
+  const toast = document.getElementById('claw-skill-add-toast');
+  if (!toast) return;
+  clearTimeout(clawSkillToastTimer);
+  toast.classList.add('is-visible');
+  toast.setAttribute('aria-hidden', 'false');
+  clawSkillToastTimer = setTimeout(() => {
+    toast.classList.remove('is-visible');
+    toast.setAttribute('aria-hidden', 'true');
+  }, 1600);
+}
+
+function closeClawSkillAgentModal() {
+  if (!clawSkillAgentOverlay) return;
+  clawSkillAgentOverlay.classList.remove('is-open');
+  clawSkillAgentOverlay.setAttribute('aria-hidden', 'true');
+}
+
+function ensureClawSkillAgentModal() {
+  if (clawSkillAgentOverlay) return clawSkillAgentOverlay;
+  clawSkillAgentOverlay = document.createElement('div');
+  clawSkillAgentOverlay.className = 'choose-shrimp-overlay claw-skill-agent-overlay';
+  clawSkillAgentOverlay.setAttribute('aria-hidden', 'true');
+  clawSkillAgentOverlay.innerHTML = `
+    <div class="choose-shrimp-modal is-single" role="dialog" aria-modal="true" aria-label="添加到智能体">
+      <div class="choose-shrimp-titlebar">
+        <div class="choose-shrimp-title">添加到智能体</div>
+        <button class="choose-shrimp-close" type="button" aria-label="关闭">
+          <img src="./icon/skills-detail-close.svg" alt="" />
+        </button>
+      </div>
+      <div class="choose-shrimp-body" role="listbox" aria-label="智能体列表"></div>
+      <div class="choose-shrimp-footer">
+        <button class="choose-shrimp-selectall" type="button" aria-hidden="true" tabindex="-1">
+          <span class="choose-shrimp-checkbox" aria-hidden="true">
+            <span class="choose-shrimp-checkbox-bg"></span>
+            <span class="choose-shrimp-checkbox-box"></span>
+            <img class="choose-shrimp-checkbox-tick" src="./icon/checkbox-check.svg" alt="" />
+          </span>
+          <span class="choose-shrimp-selectall-text">全选</span>
+        </button>
+        <div class="choose-shrimp-footer-actions">
+          <button class="choose-shrimp-cancel" type="button">取消</button>
+          <button class="choose-shrimp-confirm" type="button" disabled>确认</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(clawSkillAgentOverlay);
+
+  clawSkillAgentOverlay.addEventListener('mousedown', e => {
+    if (e.target === clawSkillAgentOverlay) closeClawSkillAgentModal();
+  });
+  clawSkillAgentOverlay.querySelector('.choose-shrimp-close')?.addEventListener('click', closeClawSkillAgentModal);
+  clawSkillAgentOverlay.querySelector('.choose-shrimp-cancel')?.addEventListener('click', closeClawSkillAgentModal);
+  clawSkillAgentOverlay.querySelector('.choose-shrimp-body')?.addEventListener('click', e => {
+    const item = e.target?.closest?.('.choose-shrimp-item');
+    if (!item) return;
+    clawSkillAgentSelectedId = item.getAttribute('data-id') || '';
+    clawSkillAgentOverlay.querySelectorAll('.choose-shrimp-item').forEach(btn => {
+      const selected = btn.getAttribute('data-id') === clawSkillAgentSelectedId;
+      btn.classList.toggle('is-selected', selected);
+      btn.setAttribute('aria-selected', selected ? 'true' : 'false');
+    });
+    clawSkillAgentOverlay.querySelector('.choose-shrimp-confirm').disabled = !clawSkillAgentSelectedId;
+  });
+  clawSkillAgentOverlay.querySelector('.choose-shrimp-confirm')?.addEventListener('click', () => {
+    if (!clawSkillAgentSelectedId) return;
+    closeClawSkillAgentModal();
+    closeClawSkillDetail();
+    showClawSkillAddToast();
+  });
+  return clawSkillAgentOverlay;
+}
+
+function openClawSkillAddAgentModal() {
+  const overlay = ensureClawSkillAgentModal();
+  const list = overlay.querySelector('.choose-shrimp-body');
+  const confirm = overlay.querySelector('.choose-shrimp-confirm');
+  const agents = getClawSkillChooseAgents();
+  clawSkillAgentSelectedId = '';
+  if (confirm) confirm.disabled = true;
+  if (list) {
+    list.innerHTML = agents.map(agent => `
+      <button class="choose-shrimp-item" type="button" data-id="${escapeHtml(agent.id)}" role="option" aria-selected="false">
+        <span class="choose-shrimp-checkbox" aria-hidden="true">
+          <span class="choose-shrimp-checkbox-bg"></span>
+          <span class="choose-shrimp-checkbox-box"></span>
+          <img class="choose-shrimp-checkbox-tick" src="./icon/checkbox-check.svg" alt="" />
+        </span>
+        <span class="choose-shrimp-main">
+          <span class="choose-shrimp-avatar-wrap">
+            <img class="choose-shrimp-avatar" src="${escapeHtml(agent.avatar)}" alt="" />
+          </span>
+          <span class="choose-shrimp-text">
+            <span class="choose-shrimp-name">${escapeHtml(agent.name)}</span>
+            <span class="choose-shrimp-desc">${escapeHtml(agent.desc)}</span>
+          </span>
+        </span>
+      </button>
+    `).join('');
+  }
+  overlay.classList.add('is-open');
+  overlay.setAttribute('aria-hidden', 'false');
 }
 
 function createClawUserBubble(text) {
@@ -5888,7 +6034,7 @@ document.querySelector('#expert-detail-modal .expert-detail-close')?.addEventLis
 
 document.querySelector('#claw-skill-detail-modal .claw-skill-detail-mask')?.addEventListener('click', closeClawSkillDetail);
 document.querySelector('#claw-skill-detail-modal .claw-skill-detail-x')?.addEventListener('click', closeClawSkillDetail);
-document.getElementById('claw-skill-detail-add-btn')?.addEventListener('click', closeClawSkillDetail);
+document.getElementById('claw-skill-detail-add-btn')?.addEventListener('click', openClawSkillAddAgentModal);
 document.querySelector('#claw-task-delete-modal .claw-task-delete-mask')?.addEventListener('click', closeTaskDeleteModal);
 document.querySelector('#claw-task-delete-modal .claw-task-delete-close')?.addEventListener('click', closeTaskDeleteModal);
 document.querySelector('#claw-task-delete-modal .claw-task-delete-cancel')?.addEventListener('click', closeTaskDeleteModal);
