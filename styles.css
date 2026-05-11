@@ -3157,6 +3157,7 @@ textarea {
   color: rgba(255, 255, 255, 0.72);
   font-size: 16px;
   line-height: 26px;
+  white-space: pre-line;
 }
 
 .agent-select-grid {
@@ -3455,9 +3456,9 @@ textarea {
 }
 
 .claw-followups button {
-  width: 232px;
+  width: fit-content;
   min-width: 0;
-  max-width: none;
+  max-width: 100%;
   height: 40px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
@@ -3466,24 +3467,17 @@ textarea {
   padding: 0 16px;
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 8px;
   font-size: 14px;
   overflow: hidden;
-}
-
-.claw-followups button:nth-child(2) {
-  width: 246px;
-}
-
-.claw-followups button:nth-child(3) {
-  width: 274px;
 }
 
 .claw-followups button span {
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
+  text-overflow: clip;
 }
 
 .claw-followups button i {

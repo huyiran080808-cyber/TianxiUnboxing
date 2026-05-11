@@ -5458,7 +5458,7 @@ function startClawIntroAnimation(options = {}) {
   const stored = new Map();
 
   [...leadParagraphs, closingParagraph].filter(Boolean).forEach(el => {
-    stored.set(el, el.textContent || '');
+    stored.set(el, el.getAttribute('data-typewriter-text') || el.textContent || '');
     el.textContent = '';
   });
 
@@ -5648,9 +5648,9 @@ function createClawAddedReply() {
       <img src="./custom-assets/claw-flow/output-actions.svg" alt="更多建议、重新、搜索、复制、收藏、赞、踩" />
     </div>
     <div class="claw-followups" hidden>
-      <button type="button" data-followup="strengths"><span>这些团队的核心优势是什么？</span><i aria-hidden="true"></i></button>
-      <button type="button" data-followup="breakthroughs"><span>他们在未来有哪些关键突破点？</span><i aria-hidden="true"></i></button>
-      <button type="button" data-followup="score"><span>这些团队的综合得分是如何评价的？</span><i aria-hidden="true"></i></button>
+      <button type="button" data-followup="literature"><span>@论文猎手 帮我查些人工智能领域的核心文献</span><i aria-hidden="true"></i></button>
+      <button type="button" data-followup="review-plan"><span>帮我整理出这周学习的核心内容和复习计划</span><i aria-hidden="true"></i></button>
+      <button type="button" data-followup="calculus"><span>帮我梳理微积分的重点和考点</span><i aria-hidden="true"></i></button>
     </div>
   `;
   bindClawFollowups(reply);
@@ -5658,12 +5658,12 @@ function createClawAddedReply() {
 }
 
 const CLAW_FOLLOWUP_REPLIES = {
-  strengths:
-    '这些团队的核心优势在于“分工明确 + 场景闭环”。学业规划小队负责把学习目标拆成每天可执行的节奏；考前突击小队擅长压缩复习路径、抓高频考点；跨境电商、软件开发、金融和自媒体团队则分别覆盖商业运营、产品交付、行情判断和内容增长。它们不是单个工具，而是一组能被连续调度的智能体组合。',
-  breakthroughs:
-    '未来最关键的突破点有三个：第一是让每个智能体记住你的长期偏好，比如学习节奏、常用资料和表达方式；第二是跨团队协同，例如产品经理拉起设计师和开发者一起推进一个任务；第三是把任务中心和提醒能力接起来，让智能体不只回答问题，也能按时间持续跟进。',
-  score:
-    '综合得分主要看四个维度：任务覆盖度、执行稳定性、结果可用性和协作效率。当前最适合高频使用的是学业规划小队、考前突击小队和软件开发工作室；跨境电商团队、股市行情分析所更适合明确目标后的专项任务；自媒体团队在选题、脚本和复盘链路上得分更高。',
+  literature:
+    '已让论文猎手进入检索模式。它会先从人工智能领域的经典基础、近三年顶会论文和高被引综述三条线梳理文献，再按“研究主题、核心贡献、适合精读程度”给你排一个阅读清单。',
+  'review-plan':
+    '可以，我会先把这周的课程笔记、作业和错题按主题归类，再拆成“必须掌握、需要巩固、考前再看”三层。最后给你排一份复习计划：每天复盘重点、补齐薄弱点，周末做一次小测。',
+  calculus:
+    '微积分这块我会按极限与连续、导数与应用、积分与应用、级数这几块来梳理。每块都会标出常考题型、易错点和对应练习方法，方便你直接拿去复习。',
 };
 
 function bindClawFollowups(scope) {
