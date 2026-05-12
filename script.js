@@ -4220,7 +4220,8 @@ const clawSelectedExperts = new Set(CLAW_EXPERTS.slice(0, 4).map(item => item.id
 let clawConfigSection = 'config';
 let activeExpertMarketItem = null;
 let expertToastTimer = null;
-let activeExpertMarketCategory = '一人公司';
+let activeExpertMarketPrimary = '一键组队';
+let activeExpertMarketSecondary = '全部';
 let activeTaskMenuId = null;
 let pendingDeleteTaskId = null;
 let selectedSubscriptionPlan = 'gold';
@@ -4923,6 +4924,92 @@ function clawAgentIcon(name, fallbackIndex = 0) {
   return CLAW_AGENT_AVATARS[name] || CLAW_EXPERTS.find(item => item.name === name)?.icon || CLAW_EXPERTS[fallbackIndex % CLAW_EXPERTS.length].icon;
 }
 
+const EXPERT_MARKET_SUBTABS = {
+  '一键组队': [],
+  '学习': ['全部', '学习备考', '学术研究', '学业规划'],
+  '工作': ['全部', '产品设计', '技术开发', '内容运营', '数据分析', '市场营销', '财务管理', '法务合规', '人力资源', '效率工具'],
+  '生活': ['全部', '情感社交', '生活服务'],
+};
+
+const EXPERT_MARKET_AGENT_META = {
+  '预习官': { primary: '学习', secondary: '学习备考', desc: '课前知识点深入讲解' },
+  '笔记整理师': { primary: '学习', secondary: '学习备考', desc: '将杂乱零散的笔记进行整理，让其具备高知识密度和可读性' },
+  '课程辅导专家': { primary: '学习', secondary: '学习备考', desc: '对知识难点深入讲解' },
+  '考前冲刺哥': { primary: '学习', secondary: '学习备考', desc: '专治考前焦虑，临阵磨枪找我就对了' },
+  '外语一对一私教': { primary: '学习', secondary: '学习备考', desc: '全球百种语言，一对一学习' },
+  '论文猎手': { primary: '学习', secondary: '学术研究', desc: '你只需指定主题，自动为你挖掘出最新最热的论文' },
+  'AI论文速读导师': { primary: '学习', secondary: '学术研究', desc: '再硬核的论文也给你掰开揉碎讲明白' },
+  '论文速读导师': { primary: '学习', secondary: '学术研究', desc: '再硬核的论文也给你掰开揉碎讲明白' },
+  '资料整理大师': { primary: '学习', secondary: '学术研究', desc: '一堆乱资料秒变结构化文档' },
+  '实验数据分析师': { primary: '学习', secondary: '学术研究', desc: '探索性实验分析、数据整理、数据可视化' },
+  '论文优化助理': { primary: '学习', secondary: '学术研究', desc: '对论文的文案、结构进行优化' },
+  '论文评审专家': { primary: '学习', secondary: '学术研究', desc: '支持全面审稿和指定维度审稿' },
+  '学习规划师': { primary: '学习', secondary: '学业规划', desc: '量身定制每日学习计划，跟着走就行' },
+  '目标拆解教练': { primary: '学习', secondary: '学业规划', desc: '年初立的flag还在吗？让我帮你拆到每天能做到' },
+  '留学规划顾问': { primary: '学习', secondary: '学业规划', desc: '多国申请+选校定位+文书指导，圆梦名校' },
+  '高考志愿填报顾问': { primary: '学习', secondary: '学业规划', desc: '院校匹配+专业推荐+分数线预测，不浪费分' },
+  '产品经理': { primary: '工作', secondary: '产品设计', desc: 'PRD+路线图+产品全生命周期，从0到1交付' },
+  'UI设计师': { primary: '工作', secondary: '产品设计', desc: '设计系统+组件库，高质量界面快速生成' },
+  'UX研究师': { primary: '工作', secondary: '产品设计', desc: '用户行为分析+可用性测试，数据驱动设计' },
+  '腾讯问卷设计专家': { primary: '工作', secondary: '产品设计', desc: '秒生成完整、高回收率的结构化问卷' },
+  '高级项目经理': { primary: '工作', secondary: '产品设计', desc: '项目规划跟踪/风险管控，按时交付不延期' },
+  '竞品情报特工': { primary: '工作', secondary: '产品设计', desc: '15分钟输出竞品深度报告，11个维度一个不落' },
+  '趋势研究员': { primary: '工作', secondary: '产品设计', desc: '市场情报+趋势预测，先人一步看到机会' },
+  '反馈分析师': { primary: '工作', secondary: '产品设计', desc: '反馈归类+洞察提取+优先级排序，迭代有方向' },
+  '前端开发者': { primary: '工作', secondary: '技术开发', desc: '精通主流前端技术栈，帮你实现高质量界面' },
+  '后端架构师': { primary: '工作', secondary: '技术开发', desc: '微服务+分布式+高可用，后端架构全局把控' },
+  '微信小程序开发助手': { primary: '工作', secondary: '技术开发', desc: 'WXML/WXSS+微信支付+云开发，快速上线' },
+  'DevOps自动工程师': { primary: '工作', secondary: '技术开发', desc: 'CI/CD流水线搭建，持续交付不停歇' },
+  '安全工程师': { primary: '工作', secondary: '技术开发', desc: '威胁建模+代码审计+安全加固，护航产品上线' },
+  '测试专家': { primary: '工作', secondary: '技术开发', desc: '接口测试全链路自动化，一键输出测试报告' },
+  '日志异常分析专家': { primary: '工作', secondary: '技术开发', desc: '百万志揪Bug，我比grep还快还准' },
+  '代码文档助手': { primary: '工作', secondary: '技术开发', desc: '你负责写代码，我负责让别人看得懂你的代码' },
+  '提示词工程师': { primary: '工作', secondary: '技术开发', desc: '帮你写出高效提示词，AI输出效果翻倍' },
+  'SQL代码工程师': { primary: '工作', secondary: '技术开发', desc: '说话就出SQL，让不会写代码的人也能玩转数据' },
+  '售前工程师': { primary: '工作', secondary: '技术开发', desc: '技术方案+Demo演示+POC验证，赢单利器' },
+  '微博运营策略师': { primary: '工作', secondary: '内容运营', desc: '话题运营+超话管理，品牌声量翻倍' },
+  '抖音运营策略师': { primary: '工作', secondary: '内容运营', desc: '让视频上热榜不靠玄学' },
+  '公众号内容助手': { primary: '工作', secondary: '内容运营', desc: '给主题即出稿，策划到排版一步到位' },
+  '小红书爆款操盘手': { primary: '工作', secondary: '内容运营', desc: '从选题到爆款全流程服务，你负责拍我负责火' },
+  '自媒体文案大师': { primary: '工作', secondary: '内容运营', desc: '从种草文到短视频脚本，全平台爆款文案一站搞定' },
+  '自媒体热点猎手': { primary: '工作', secondary: '内容运营', desc: '7x24h全网热搜雷达，只推送你领域相关的精准选题弹药' },
+  '自媒体数据分析专家': { primary: '工作', secondary: '内容运营', desc: '用数据说话，帮你看清每条内容的真实表现和优化方向' },
+  '快手策略师': { primary: '工作', secondary: '内容运营', desc: '内容创作到直播电商，帮抓下沉市场机遇' },
+  'TikTok策略师': { primary: '工作', secondary: '内容运营', desc: '病毒式内容+算法优化，全球流量把抓' },
+  '高级数据分析师': { primary: '工作', secondary: '数据分析', desc: '自动解析数据背后的洞察与建议' },
+  'A股行情追踪专家': { primary: '工作', secondary: '财务管理', desc: '7x24小时盯盘，异动第一时间送达' },
+  '基金掘金师': { primary: '工作', secondary: '财务管理', desc: '3000+只基金我帮你翻，只挑真正能拿住的' },
+  '个股诊断专家': { primary: '工作', secondary: '财务管理', desc: '深度扫描，看透每只股的价值与风险' },
+  '金融风控分析师': { primary: '工作', secondary: '财务管理', desc: '信用评估+反欺诈+合规审查，全面防控风险' },
+  '发票管理专家': { primary: '工作', secondary: '财务管理', desc: '增值税发票+金税系统+三单匹配，票据无忧' },
+  'ROI精算师': { primary: '工作', secondary: '财务管理', desc: '这笔钱花得值不值？算完你心里就有数了' },
+  '宏观经济专家': { primary: '工作', secondary: '财务管理', desc: '利率变了？政策又吹了？我帮你拆明白' },
+  '合同审查专家': { primary: '工作', secondary: '法务合规', desc: '条款风险逐条识别，修改建议一步到位' },
+  '制度文件撰写专家': { primary: '工作', secondary: '法务合规', desc: '帮你起草和审查各类制度文件' },
+  '文件对比专家': { primary: '工作', secondary: '法务合规', desc: '100页件哪里改了？我快速给你标出来' },
+  '绩效管理专家': { primary: '工作', secondary: '人力资源', desc: 'OKR/KPI+361分布+晋升答辩，激发团队潜能' },
+  '招聘专家': { primary: '工作', secondary: '人力资源', desc: 'JD撰写到背调，高效完成招聘全流程' },
+  'Outlook邮箱管理专家': { primary: '工作', secondary: '效率工具', desc: '自动分类、提炼、收发邮件，解放繁琐' },
+  'WPS表格美化整理师': { primary: '工作', secondary: '效率工具', desc: '丢给我散乱笔记，还你清爽专业表格' },
+  '深夜解压大师': { primary: '生活', secondary: '情感社交', desc: '深夜陪伴：情绪疏导+倾听助眠' },
+  'MBTI配对师': { primary: '生活', secondary: '情感社交', desc: '输入双方MBTI，深度解读关系匹配与雷区' },
+  '吃货参谋': { primary: '生活', secondary: '生活服务', desc: '“随便”不是一道菜，让我来终结你的选择困难' },
+  '懒人出游规划师': { primary: '生活', secondary: '生活服务', desc: '一键出游：天气+行程全搞定' },
+  '私人健身教练': { primary: '生活', secondary: '生活服务', desc: '不卖课不画饼，只给你一份练了就有效的计划' },
+};
+
+const EXPERT_MARKET_EXTRA_AGENTS = Object.keys(EXPERT_MARKET_AGENT_META)
+  .map((name, index) => {
+    const meta = EXPERT_MARKET_AGENT_META[name];
+    return {
+      name,
+      desc: meta.desc,
+      icon: clawAgentIcon(name, index),
+      primary: meta.primary,
+      secondary: meta.secondary,
+    };
+  });
+
 const EXPERT_MARKET_TEAMS = [
   {
     id: 'exam',
@@ -5016,6 +5103,52 @@ const EXPERT_MARKET_TEAMS = [
     ],
   },
 ];
+
+const EXPERT_MARKET_TEAM_ORDER = ['exam', 'media', 'cross-border', 'dev', 'stock', 'study'];
+
+function normalizeExpertMarketData() {
+  EXPERT_MARKET_TEAMS.forEach(team => {
+    team.experts.forEach((expert, index) => {
+      const meta = EXPERT_MARKET_AGENT_META[expert.name] || {};
+      expert.primary = meta.primary || team.primary || '工作';
+      expert.secondary = meta.secondary || team.secondary || team.category || '效率工具';
+      if (meta.desc) expert.desc = meta.desc;
+      expert.icon = expert.icon || clawAgentIcon(expert.name, index);
+    });
+  });
+}
+
+normalizeExpertMarketData();
+
+const EXPERT_MARKET_CATALOG_TEAMS = EXPERT_MARKET_EXTRA_AGENTS
+  .filter(agent => !EXPERT_MARKET_TEAMS.some(team => team.experts.some(expert => expert.name === agent.name)))
+  .map((agent, index) => ({
+    id: `catalog-${index}`,
+    title: agent.secondary || agent.primary || '智能体',
+    icon: '',
+    tone: 'cold',
+    category: agent.primary,
+    catalogOnly: true,
+    experts: [agent],
+  }));
+
+function getExpertMarketTeamCards() {
+  return [...EXPERT_MARKET_TEAMS].sort((a, b) => {
+    const aIndex = EXPERT_MARKET_TEAM_ORDER.indexOf(a.id);
+    const bIndex = EXPERT_MARKET_TEAM_ORDER.indexOf(b.id);
+    return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+  });
+}
+
+function getExpertMarketAgents() {
+  const byName = new Map();
+  [...EXPERT_MARKET_TEAMS, ...EXPERT_MARKET_CATALOG_TEAMS].forEach(team => {
+    team.experts.forEach(expert => {
+      if (!byName.has(expert.name)) byName.set(expert.name, { team, expert });
+    });
+  });
+  return [...byName.values()];
+}
 
 function setClawFlowInactive() {
   clawWindowFrame?.classList.remove('claw-flow-active', 'claw-flow-home', 'claw-flow-loading', 'claw-flow-config');
@@ -5124,7 +5257,7 @@ function stopClawLoadingAnimation() {
 
 function startClawLoadingAnimation() {
   stopClawLoadingAnimation();
-  const duration = 2000;
+  const duration = 1000;
   const startedAt = performance.now();
   if (clawLoadingBar) clawLoadingBar.style.width = '0%';
 
@@ -5659,11 +5792,73 @@ function createClawAddedReply() {
 
 const CLAW_FOLLOWUP_REPLIES = {
   literature:
-    '收到，我会让论文猎手先按“经典基础 + 关键方法 + 近年趋势”三条线帮你搭一份人工智能核心文献清单。\n\n优先建议精读这几类：\n1. 基础脉络：图灵测试、专家系统、机器学习、深度学习的代表性论文，帮你先建立 AI 发展坐标。\n2. 核心方法：Transformer、强化学习、生成模型、多模态模型等方向，每篇标注核心贡献和适合阅读的章节。\n3. 近年热点：大模型对齐、RAG、AI Agent、具身智能与安全评测，按“综述优先、代表作跟进”的顺序整理。\n\n最后我会输出一张阅读表：论文名称、研究主题、为什么重要、适合精读还是速读，以及你可以直接写进作业/论文综述里的摘要要点。',
+    `收到，我会让 @论文猎手 按“经典基础 + 关键方法 + 近年趋势 + 可引用综述”四条线帮你搭一份人工智能核心文献清单。📚
+
+🔎 我会先这样筛：
+1. 先抓经典奠基文献：图灵测试、专家系统、机器学习、深度学习、注意力机制这些关键节点，帮你建立 AI 发展的时间线。
+2. 再补核心方法论文：Transformer、BERT/GPT、扩散模型、强化学习、多模态学习、检索增强生成，每个方向挑代表作和高质量综述。
+3. 继续看近三年热点：大模型对齐、AI Agent、RAG、长上下文、多模态推理、具身智能、AI 安全评测，优先选顶会、引用高、综述清楚的论文。
+4. 最后按你的用途筛一遍：如果是课程作业，我会偏向易读和可引用；如果是论文开题，我会偏向研究空白和方法延展。
+
+🧭 输出会分成三层：
+• 必读 5 篇：最能撑起 AI 基础框架的文献。
+• 精读 8 篇：每个方向 1-2 篇代表作，附核心贡献和阅读顺序。
+• 速读 10 篇：用于扩展背景、补充参考文献和找研究趋势。
+
+📝 每篇我都会标注：论文题目、年份/会议、研究问题、核心方法、为什么重要、适合精读的章节，以及可以直接写进综述里的 1-2 句中文摘要。
+
+如果你要写一篇“人工智能发展综述”，我建议先从 Transformer、生成模型、RAG 和 AI Agent 四个方向入手，因为这几条线最容易串成一篇完整、有重点的文献脉络。`,
   'review-plan':
-    '可以，我会先把这周学习内容整理成“知识点清单、作业错题、待补漏洞、复习安排”四块，帮你从一堆材料里抓出主线。\n\n我会这样处理：\n1. 先按课程/章节归类，把重复内容合并，筛掉只需要了解的部分。\n2. 把重点拆成三层：必须掌握、需要巩固、考前快速回看。\n3. 根据作业和错题标出薄弱点，比如概念混淆、公式不熟、解题步骤断档。\n4. 给你排一份 7 天复习计划：每天复盘 30 分钟重点，补一个薄弱点，最后用一组小测检查掌握情况。\n\n如果你把课件、笔记或作业发给我，我还能继续把计划细化到每天具体看哪几页、做哪类题。',
+    `可以，我会把这周学习内容整理成“知识点清单、作业错题、待补漏洞、复习安排、考前速看”五块，帮你从一堆材料里抓出真正要复习的主线。🗂️
+
+📌 第一步：先帮你归类
+1. 按课程/章节整理，把课件、笔记、作业、课堂截图、错题归到同一个主题下面。
+2. 合并重复知识点，把老师反复强调、作业反复出现、考试高频出现的内容标成重点。
+3. 区分“会考”“可能考”“了解即可”三类，避免复习时平均用力。
+4. 把本周内容整理成一张总览表：章节、核心概念、典型题型、当前掌握度、下一步动作。
+
+🧠 第二步：拆出学习重点
+• 必须掌握：定义、公式、核心定理、基础题型，属于不能丢分的部分。
+• 需要巩固：课堂听懂但题目容易卡住的地方，比如步骤缺失、条件没看清、公式选错。
+• 考前快速回看：适合做成 1 页速记卡的内容，比如易错点、关键词、解题模板。
+• 暂时放后：短期投入产出比不高的拓展内容，先不占用主复习时间。
+
+🧪 第三步：按错题倒推漏洞
+我会把错题拆成四种原因：概念不清、公式不熟、步骤断档、审题失误。每道错题都会对应一个补救动作，比如“重看某页课件”“补 3 道同类题”“整理一个公式卡片”。
+
+📅 第四步：给你排 7 天复习计划
+Day 1：整理材料，生成知识点地图。
+Day 2：复盘必须掌握内容，补齐概念。
+Day 3：集中处理作业错题，找同类题训练。
+Day 4：做章节小测，检查薄弱点。
+Day 5：补难点，整理速记卡。
+Day 6：模拟一次考试节奏，限时做题。
+Day 7：只看错题本和速记卡，轻量复盘。
+
+✅ 最后我会给你一个可执行清单：今天先看什么、做哪几道题、哪些内容先跳过、睡前用 10 分钟复盘什么。你把课件、笔记或作业发给我后，我还能继续细化到“第几页、第几题、第几个公式”。`,
   calculus:
-    '没问题，微积分我会按考试最常见的结构帮你梳理，而不是单纯列概念。\n\n重点会分成这几块：\n1. 极限与连续：等价无穷小、洛必达、夹逼准则，重点防止“条件没看清就套公式”。\n2. 导数与微分：求导法则、隐函数、参数方程、高阶导，常和单调性、极值、最值结合考。\n3. 积分：不定积分换元/分部，定积分几何意义、变上限积分、反常积分，注意计算步骤和边界条件。\n4. 多元函数与级数：偏导、极值、二重积分、幂级数收敛半径，属于拉分题高发区。\n\n我会再给你配一张“考点 - 常见题型 - 易错提醒 - 练习建议”表，复习时直接照着查漏补缺。',
+    `没问题，微积分我会按“考点地图 + 常见题型 + 易错提醒 + 练习策略”来梳理，不只是把概念列一遍。🧮
+
+📍 第一块：极限与连续
+重点看等价无穷小、洛必达法则、夹逼准则、左右极限、函数连续性。这里最容易错在“条件没满足就套公式”，比如洛必达要先判断 0/0 或 ∞/∞，连续性也要同时看函数值和极限。
+
+📈 第二块：导数与微分
+重点看复合函数求导、隐函数求导、参数方程求导、高阶导数、导数应用。考试常把它和单调性、凹凸性、极值、最值、切线法线一起考。复习时建议把“求导公式表 + 应用题模板”放在一起看。
+
+∫ 第三块：积分
+不定积分重点是换元法、分部积分、常见凑微分；定积分重点是几何意义、对称性、变上限积分、反常积分。这里要特别注意上下限、符号、积分区间和是否需要分段。
+
+🧩 第四块：多元函数与级数
+多元函数看偏导、全微分、方向导数、极值与条件极值；级数看正项级数、交错级数、幂级数收敛半径和收敛域。这块经常是拉分题，重点是会判断题型，而不是硬背结论。
+
+⚠️ 高频易错点我会单独列：
+• 极限题忘记先化简。
+• 求导题漏掉链式法则。
+• 积分题换元后忘记改上下限。
+• 多元极值题只求驻点，不判断性质。
+• 级数题只算半径，忘记检查端点。
+
+📝 最后会给你一张复习表：考点、公式、典型题、易错点、推荐练习方式。复习顺序建议是“极限 → 导数 → 积分 → 多元/级数”，每天做 3 道基础题 + 2 道综合题，三天后再做一套限时小测。`,
 };
 
 function bindClawFollowups(scope) {
@@ -5787,13 +5982,19 @@ function renderExpertMarket() {
   const grid = document.getElementById('expert-team-grid');
   if (!grid) return;
   bindExpertMarketTabs();
+  renderExpertMarketSubtabs();
 
-  const teams = activeExpertMarketCategory === '一人公司'
-    ? EXPERT_MARKET_TEAMS
-    : EXPERT_MARKET_TEAMS.filter(team => team.category === activeExpertMarketCategory);
-  grid.classList.toggle('is-agent-grid', activeExpertMarketCategory !== '一人公司');
+  const isTeamMode = activeExpertMarketPrimary === '一键组队';
+  const teams = isTeamMode
+    ? getExpertMarketTeamCards()
+    : getExpertMarketAgents().filter(({ expert }) => {
+        const matchesPrimary = expert.primary === activeExpertMarketPrimary;
+        const matchesSecondary = activeExpertMarketSecondary === '全部' || expert.secondary === activeExpertMarketSecondary;
+        return matchesPrimary && matchesSecondary;
+      });
+  grid.classList.toggle('is-agent-grid', !isTeamMode);
 
-  if (activeExpertMarketCategory === '一人公司') {
+  if (isTeamMode) {
     grid.innerHTML = teams.map(team => {
       const teamAdded = isMarketTeamFullyAdded(team);
       team.added = teamAdded;
@@ -5817,8 +6018,7 @@ function renderExpertMarket() {
       </article>
     `}).join('');
   } else {
-    const experts = teams.flatMap(team => team.experts.map(expert => ({ team, expert })));
-    grid.innerHTML = experts.map(({ team, expert }) => `
+    grid.innerHTML = teams.map(({ team, expert }) => `
       <button class="expert-agent-card${expert.added ? ' is-added' : ''}" type="button" data-team-id="${team.id}" data-expert-name="${escapeHtml(expert.name)}">
         <img src="${expert.icon}" alt="" />
         <strong>${escapeHtml(expert.name)}</strong>
@@ -5842,9 +6042,10 @@ function bindExpertMarketTabs() {
   const tabs = document.querySelector('.expert-market-tabs');
   if (!tabs || tabs.dataset.bound === 'true') return;
   tabs.dataset.bound = 'true';
-  tabs.querySelectorAll('button:not(.expert-tab-more)').forEach(button => {
+  tabs.querySelectorAll('button[data-expert-primary]').forEach(button => {
     button.addEventListener('click', () => {
-      activeExpertMarketCategory = button.textContent.trim();
+      activeExpertMarketPrimary = button.dataset.expertPrimary || button.textContent.trim();
+      activeExpertMarketSecondary = '全部';
       tabs.querySelectorAll('button').forEach(item => item.classList.toggle('is-active', item === button));
       renderExpertMarket();
       document.querySelector('.expert-market-scroll')?.scrollTo({ top: 0 });
@@ -5852,8 +6053,26 @@ function bindExpertMarketTabs() {
   });
 }
 
+function renderExpertMarketSubtabs() {
+  const subtabs = document.getElementById('expert-market-subtabs');
+  if (!subtabs) return;
+  const items = EXPERT_MARKET_SUBTABS[activeExpertMarketPrimary] || [];
+  subtabs.hidden = items.length === 0;
+  subtabs.innerHTML = items.map(item => `
+    <button class="${item === activeExpertMarketSecondary ? 'is-active' : ''}" type="button" data-expert-secondary="${escapeHtml(item)}">${escapeHtml(item)}</button>
+  `).join('');
+  subtabs.querySelectorAll('button').forEach(button => {
+    button.addEventListener('click', () => {
+      activeExpertMarketSecondary = button.dataset.expertSecondary || '全部';
+      subtabs.querySelectorAll('button').forEach(item => item.classList.toggle('is-active', item === button));
+      renderExpertMarket();
+      document.querySelector('.expert-market-scroll')?.scrollTo({ top: 0 });
+    });
+  });
+}
+
 function findMarketTeam(teamId) {
-  return EXPERT_MARKET_TEAMS.find(team => team.id === teamId);
+  return [...EXPERT_MARKET_TEAMS, ...EXPERT_MARKET_CATALOG_TEAMS].find(team => team.id === teamId);
 }
 
 function findMarketExpert(teamId, expertName) {
@@ -5863,7 +6082,7 @@ function findMarketExpert(teamId, expertName) {
 }
 
 function findMarketExpertByName(expertName) {
-  for (const team of EXPERT_MARKET_TEAMS) {
+  for (const team of [...EXPERT_MARKET_TEAMS, ...EXPERT_MARKET_CATALOG_TEAMS]) {
     const expert = team.experts.find(item => item.name === expertName);
     if (expert) return { team, expert };
   }

@@ -3614,15 +3614,16 @@ textarea {
 
 .expert-market-tabs {
   width: 780px;
-  margin: 0 auto 20px;
+  margin: 0 auto 14px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0;
+  justify-content: center;
+  gap: 20px;
   white-space: nowrap;
 }
 
-.expert-market-tabs button {
+.expert-market-tabs button,
+.expert-market-subtabs button {
   height: 32px;
   border: 0;
   border-radius: 12px;
@@ -3632,22 +3633,38 @@ textarea {
   font-size: 14px;
 }
 
-.expert-market-tabs button.is-active {
+.expert-market-tabs button.is-active,
+.expert-market-subtabs button.is-active {
   background: #fff;
   color: #18181b;
 }
 
-.expert-market-tabs .expert-tab-more {
-  width: 18px;
-  padding: 0;
-  display: grid;
-  place-items: center;
+.expert-market-subtabs {
+  width: 780px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-.expert-market-tabs .expert-tab-more img {
-  width: 18px;
-  height: 18px;
-  display: block;
+.expert-market-subtabs[hidden] {
+  display: none;
+}
+
+.expert-market-subtabs::-webkit-scrollbar {
+  display: none;
+}
+
+.expert-market-subtabs button {
+  height: 30px;
+  border-radius: 10px;
+  padding: 0 14px;
+  font-size: 13px;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .expert-team-grid {

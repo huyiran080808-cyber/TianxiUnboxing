@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=107" />
+    <link rel="stylesheet" href="./styles.css?v=108" />
   </head>
   <body>
     <main class="app-shell">
@@ -353,18 +353,13 @@
                     <input type="search" placeholder="搜索智能体" aria-label="搜索智能体" />
                   </label>
                 </header>
-                <div class="expert-market-tabs" aria-label="智能体分类">
-                  <button class="is-active" type="button">一人公司</button>
-                  <button type="button">学术教育</button>
-                  <button type="button">产品设计</button>
-                  <button type="button">技术工程</button>
-                  <button type="button">法务</button>
-                  <button type="button">人力行政</button>
-                  <button type="button">金融</button>
-                  <button type="button">营销增长</button>
-                  <button type="button">数据分析</button>
-                  <button class="expert-tab-more" type="button" aria-label="更多分类"><img src="./custom-assets/claw-flow/market-tab-arrow.svg" alt="" /></button>
+                <div class="expert-market-tabs" aria-label="智能体一级分类">
+                  <button class="is-active" type="button" data-expert-primary="一键组队">一键组队</button>
+                  <button type="button" data-expert-primary="学习">学习</button>
+                  <button type="button" data-expert-primary="工作">工作</button>
+                  <button type="button" data-expert-primary="生活">生活</button>
                 </div>
+                <div class="expert-market-subtabs" id="expert-market-subtabs" aria-label="智能体二级分类" hidden></div>
                 <div class="expert-team-grid" id="expert-team-grid" aria-label="智能体广场列表"></div>
               </div>
             </div>
@@ -1839,6 +1834,6 @@
       </section>
     </main>
 
-    <script src="./script.js?v=93"></script>
+    <script src="./script.js?v=95"></script>
   </body>
 </html>
