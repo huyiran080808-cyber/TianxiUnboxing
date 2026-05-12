@@ -5395,6 +5395,7 @@ function renderClawAgentHome() {
   }
   if (title) title.innerHTML = `Hi，我是<span class="claw-agent-name-underline">${escapeHtml(agent.name || '小天')}</span>`;
   if (desc) desc.textContent = agent.desc || CLAW_XIAOTIAN_HOME.desc;
+  document.querySelector('.claw-quick-new-agent-title')?.replaceChildren(document.createTextNode('新建智能体'));
 }
 
 function openClawAgentHome(agent) {
