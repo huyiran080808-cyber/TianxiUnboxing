@@ -3632,12 +3632,21 @@ textarea {
   color: rgba(255, 255, 255, 0.8);
   padding: 0 16px;
   font-size: 14px;
+  transition: background 160ms ease, color 160ms ease;
 }
 
-.expert-market-tabs button.is-active,
-.expert-market-subtabs button.is-active {
+.expert-market-tabs button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.expert-market-tabs button.is-active {
   background: #fff;
   color: #18181b;
+}
+
+.expert-market-tabs button.is-active:hover {
+  background: rgba(255, 255, 255, 0.92);
 }
 
 .expert-market-subtabs {
@@ -3660,12 +3669,19 @@ textarea {
 }
 
 .expert-market-subtabs button {
-  height: 30px;
-  border-radius: 10px;
+  min-width: 72px;
+  height: 26px;
+  border-radius: 13px;
   padding: 0 14px;
   font-size: 13px;
   flex: 0 0 auto;
   white-space: nowrap;
+}
+
+.expert-market-subtabs button:hover,
+.expert-market-subtabs button.is-active {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .expert-team-grid {
