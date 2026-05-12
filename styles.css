@@ -2980,32 +2980,6 @@ textarea {
   background: rgba(255, 255, 255, 0.03);
 }
 
-.claw-xiaotian-quick-row button:first-child::before {
-  content: "";
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 1;
-  width: 136px;
-  height: 25px;
-  border-radius: 4px;
-  background: #222;
-  pointer-events: none;
-}
-
-.claw-xiaotian-quick-row button:first-child::after {
-  content: "新建智能体";
-  position: absolute;
-  top: 22px;
-  left: 20px;
-  z-index: 2;
-  color: rgba(255, 255, 255, 0.86);
-  font-size: 14px;
-  line-height: 21px;
-  font-weight: 600;
-  pointer-events: none;
-}
-
 .claw-xiaotian-quick-icon {
   opacity: 0;
   width: 36px;
