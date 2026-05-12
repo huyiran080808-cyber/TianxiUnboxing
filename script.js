@@ -4931,6 +4931,11 @@ const EXPERT_MARKET_SUBTABS = {
   '生活': ['全部', '情感社交', '生活服务'],
 };
 
+const EXPERT_MARKET_SECONDARY_ORDER = {
+  '数据分析': ['自媒体数据分析专家', '高级数据分析师', 'SQL代码工程师', '库存预测专家', 'ROI精算师'],
+  '市场营销': ['广告创意策略师', '竞品情报特工', '趋势研究员', '跨境社媒营销官', '种草图文设计师', '跨境电商情报探长', 'PPC竞价策略师', '库存预测专家', '销售教练'],
+};
+
 const EXPERT_MARKET_AGENT_META = {
   '预习官': { primary: '学习', secondary: '学习备考', desc: '课前知识点深入讲解' },
   '笔记整理师': { primary: '学习', secondary: '学习备考', desc: '将杂乱零散的笔记进行整理，让其具备高知识密度和可读性' },
@@ -4953,8 +4958,8 @@ const EXPERT_MARKET_AGENT_META = {
   'UX研究师': { primary: '工作', secondary: '产品设计', desc: '用户行为分析+可用性测试，数据驱动设计' },
   '腾讯问卷设计专家': { primary: '工作', secondary: '产品设计', desc: '秒生成完整、高回收率的结构化问卷' },
   '高级项目经理': { primary: '工作', secondary: '产品设计', desc: '项目规划跟踪/风险管控，按时交付不延期' },
-  '竞品情报特工': { primary: '工作', secondary: '产品设计', desc: '15分钟输出竞品深度报告，11个维度一个不落' },
-  '趋势研究员': { primary: '工作', secondary: '产品设计', desc: '市场情报+趋势预测，先人一步看到机会' },
+  '竞品情报特工': { primary: '工作', secondary: '产品设计', secondaryAlso: ['市场营销'], desc: '15分钟输出竞品深度报告，11个维度一个不落' },
+  '趋势研究员': { primary: '工作', secondary: '产品设计', secondaryAlso: ['市场营销'], desc: '市场情报+趋势预测，先人一步看到机会' },
   '反馈分析师': { primary: '工作', secondary: '产品设计', desc: '反馈归类+洞察提取+优先级排序，迭代有方向' },
   '前端开发者': { primary: '工作', secondary: '技术开发', desc: '精通主流前端技术栈，帮你实现高质量界面' },
   '后端架构师': { primary: '工作', secondary: '技术开发', desc: '微服务+分布式+高可用，后端架构全局把控' },
@@ -4965,24 +4970,31 @@ const EXPERT_MARKET_AGENT_META = {
   '日志异常分析专家': { primary: '工作', secondary: '技术开发', desc: '百万志揪Bug，我比grep还快还准' },
   '代码文档助手': { primary: '工作', secondary: '技术开发', desc: '你负责写代码，我负责让别人看得懂你的代码' },
   '提示词工程师': { primary: '工作', secondary: '技术开发', desc: '帮你写出高效提示词，AI输出效果翻倍' },
-  'SQL代码工程师': { primary: '工作', secondary: '技术开发', desc: '说话就出SQL，让不会写代码的人也能玩转数据' },
+  'SQL代码工程师': { primary: '工作', secondary: '技术开发', secondaryAlso: ['数据分析'], desc: '说话就出SQL，让不会写代码的人也能玩转数据' },
   '售前工程师': { primary: '工作', secondary: '技术开发', desc: '技术方案+Demo演示+POC验证，赢单利器' },
+  '广告创意策略师': { primary: '工作', secondary: '市场营销', desc: '素材文案到A/B测试，最大化广告转化效果' },
+  '跨境社媒营销官': { primary: '工作', secondary: '市场营销', desc: '一条指令搞定六大平台内容生产与发布' },
+  '种草图文设计师': { primary: '工作', secondary: '市场营销', desc: '给个主题，自动出每页文案+排版+配色方案' },
+  '销售教练': { primary: '工作', secondary: '市场营销', desc: '话术+客户管理+成交技巧，全面提升成交率' },
   '微博运营策略师': { primary: '工作', secondary: '内容运营', desc: '话题运营+超话管理，品牌声量翻倍' },
   '抖音运营策略师': { primary: '工作', secondary: '内容运营', desc: '让视频上热榜不靠玄学' },
   '公众号内容助手': { primary: '工作', secondary: '内容运营', desc: '给主题即出稿，策划到排版一步到位' },
   '小红书爆款操盘手': { primary: '工作', secondary: '内容运营', desc: '从选题到爆款全流程服务，你负责拍我负责火' },
   '自媒体文案大师': { primary: '工作', secondary: '内容运营', desc: '从种草文到短视频脚本，全平台爆款文案一站搞定' },
   '自媒体热点猎手': { primary: '工作', secondary: '内容运营', desc: '7x24h全网热搜雷达，只推送你领域相关的精准选题弹药' },
-  '自媒体数据分析专家': { primary: '工作', secondary: '内容运营', desc: '用数据说话，帮你看清每条内容的真实表现和优化方向' },
+  '自媒体数据分析专家': { primary: '工作', secondary: '内容运营', secondaryAlso: ['数据分析'], desc: '用数据说话，帮你看清每条内容的真实表现和优化方向' },
   '快手策略师': { primary: '工作', secondary: '内容运营', desc: '内容创作到直播电商，帮抓下沉市场机遇' },
   'TikTok策略师': { primary: '工作', secondary: '内容运营', desc: '病毒式内容+算法优化，全球流量把抓' },
+  '跨境电商情报探长': { primary: '工作', secondary: '市场营销', desc: '对打了个喷嚏我都知道，7x24情报不断线' },
+  '库存预测专家': { primary: '工作', secondary: '市场营销', secondaryAlso: ['数据分析'], desc: '需求预测+安全库存+大促备货，精准管库存' },
+  'PPC竞价策略师': { primary: '工作', secondary: '市场营销', desc: '关键词+出价+质量分优化，最大化广告ROI' },
   '高级数据分析师': { primary: '工作', secondary: '数据分析', desc: '自动解析数据背后的洞察与建议' },
   'A股行情追踪专家': { primary: '工作', secondary: '财务管理', desc: '7x24小时盯盘，异动第一时间送达' },
   '基金掘金师': { primary: '工作', secondary: '财务管理', desc: '3000+只基金我帮你翻，只挑真正能拿住的' },
   '个股诊断专家': { primary: '工作', secondary: '财务管理', desc: '深度扫描，看透每只股的价值与风险' },
   '金融风控分析师': { primary: '工作', secondary: '财务管理', desc: '信用评估+反欺诈+合规审查，全面防控风险' },
   '发票管理专家': { primary: '工作', secondary: '财务管理', desc: '增值税发票+金税系统+三单匹配，票据无忧' },
-  'ROI精算师': { primary: '工作', secondary: '财务管理', desc: '这笔钱花得值不值？算完你心里就有数了' },
+  'ROI精算师': { primary: '工作', secondary: '财务管理', secondaryAlso: ['数据分析'], desc: '这笔钱花得值不值？算完你心里就有数了' },
   '宏观经济专家': { primary: '工作', secondary: '财务管理', desc: '利率变了？政策又吹了？我帮你拆明白' },
   '合同审查专家': { primary: '工作', secondary: '法务合规', desc: '条款风险逐条识别，修改建议一步到位' },
   '制度文件撰写专家': { primary: '工作', secondary: '法务合规', desc: '帮你起草和审查各类制度文件' },
@@ -5007,6 +5019,7 @@ const EXPERT_MARKET_EXTRA_AGENTS = Object.keys(EXPERT_MARKET_AGENT_META)
       icon: clawAgentIcon(name, index),
       primary: meta.primary,
       secondary: meta.secondary,
+      secondaryAlso: meta.secondaryAlso || [],
     };
   });
 
@@ -5112,6 +5125,7 @@ function normalizeExpertMarketData() {
       const meta = EXPERT_MARKET_AGENT_META[expert.name] || {};
       expert.primary = meta.primary || team.primary || '工作';
       expert.secondary = meta.secondary || team.secondary || team.category || '效率工具';
+      expert.secondaryAlso = meta.secondaryAlso || expert.secondaryAlso || [];
       if (meta.desc) expert.desc = meta.desc;
       expert.icon = expert.icon || clawAgentIcon(expert.name, index);
     });
@@ -5985,13 +5999,22 @@ function renderExpertMarket() {
   renderExpertMarketSubtabs();
 
   const isTeamMode = activeExpertMarketPrimary === '一键组队';
-  const teams = isTeamMode
+  let teams = isTeamMode
     ? getExpertMarketTeamCards()
     : getExpertMarketAgents().filter(({ expert }) => {
         const matchesPrimary = expert.primary === activeExpertMarketPrimary;
-        const matchesSecondary = activeExpertMarketSecondary === '全部' || expert.secondary === activeExpertMarketSecondary;
+        const secondaryList = [expert.secondary, ...(expert.secondaryAlso || [])];
+        const matchesSecondary = activeExpertMarketSecondary === '全部' || secondaryList.includes(activeExpertMarketSecondary);
         return matchesPrimary && matchesSecondary;
       });
+  if (!isTeamMode && EXPERT_MARKET_SECONDARY_ORDER[activeExpertMarketSecondary]) {
+    const order = EXPERT_MARKET_SECONDARY_ORDER[activeExpertMarketSecondary];
+    teams = [...teams].sort((a, b) => {
+      const aIndex = order.indexOf(a.expert.name);
+      const bIndex = order.indexOf(b.expert.name);
+      return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+    });
+  }
   grid.classList.toggle('is-agent-grid', !isTeamMode);
 
   if (isTeamMode) {
@@ -6066,7 +6089,6 @@ function renderExpertMarketSubtabs() {
       activeExpertMarketSecondary = button.dataset.expertSecondary || '全部';
       subtabs.querySelectorAll('button').forEach(item => item.classList.toggle('is-active', item === button));
       renderExpertMarket();
-      document.querySelector('.expert-market-scroll')?.scrollTo({ top: 0 });
     });
   });
 }

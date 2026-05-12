@@ -3536,6 +3536,7 @@ textarea {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 20px 20px 52px;
+  scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
@@ -3617,8 +3618,8 @@ textarea {
   margin: 0 auto 14px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 20px;
+  justify-content: flex-start;
+  gap: 28px;
   white-space: nowrap;
 }
 
