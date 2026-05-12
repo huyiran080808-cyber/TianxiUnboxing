@@ -2978,7 +2978,7 @@ textarea {
 
 .claw-xiaotian-quick-row button:first-child {
   background-color: #0a0a0b;
-  background-image: url("./custom-assets/claw-flow/xiaotian-new-agent-card-clean.svg?v=1");
+  background-image: url("./custom-assets/claw-flow/xiaotian-new-agent-card-clean.svg?v=2");
   background-position: center;
   background-size: 100% 100%;
   background-repeat: no-repeat;
@@ -2992,7 +2992,7 @@ textarea {
   background-color: #0a0a0b;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.03)),
-    url("./custom-assets/claw-flow/xiaotian-new-agent-card-clean.svg?v=1");
+    url("./custom-assets/claw-flow/xiaotian-new-agent-card-clean.svg?v=2");
   background-position: center, center;
   background-size: 100% 100%, 100% 100%;
   background-repeat: no-repeat, no-repeat;
