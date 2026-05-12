@@ -5285,6 +5285,8 @@ function startClawLoadingAnimation() {
   clawLoadingFrame = requestAnimationFrame(tick);
   clawLoadingTimer = setTimeout(() => {
     clawIntroAnimationStarted = false;
+    activeClawHomeAgent = CLAW_XIAOTIAN_HOME;
+    clawConfigSection = 'xiaotian';
     navigateTo('claw-config');
   }, duration);
 }
