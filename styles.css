@@ -2976,8 +2976,52 @@ textarea {
   align-items: flex-start;
 }
 
-.claw-xiaotian-quick-row button:hover {
+.claw-xiaotian-quick-row button:first-child {
+  background-color: #0a0a0b;
+  background-image: url("./custom-assets/claw-flow/xiaotian-new-agent-card-clean.svg?v=1");
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.claw-xiaotian-quick-row button:hover:not(:first-child) {
   background: rgba(255, 255, 255, 0.03);
+}
+
+.claw-xiaotian-quick-row button:first-child:hover {
+  background-color: #0a0a0b;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.03)),
+    url("./custom-assets/claw-flow/xiaotian-new-agent-card-clean.svg?v=1");
+  background-position: center, center;
+  background-size: 100% 100%, 100% 100%;
+  background-repeat: no-repeat, no-repeat;
+}
+
+.claw-xiaotian-quick-row button:first-child strong.claw-quick-new-agent-title {
+  opacity: 1;
+  position: absolute;
+  z-index: 2;
+  left: 25px;
+  top: 21px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+}
+
+.claw-xiaotian-quick-row button:first-child small {
+  opacity: 1;
+  position: absolute;
+  z-index: 2;
+  left: 25px;
+  top: 45px;
+  margin: 0;
+  max-width: calc(100% - 40px);
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 12px;
+  line-height: 18px;
 }
 
 .claw-xiaotian-quick-icon {
