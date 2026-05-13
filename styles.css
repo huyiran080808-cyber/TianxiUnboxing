@@ -2236,6 +2236,7 @@ textarea {
 }
 
 .loading-beta {
+  display: none;
   position: absolute;
   right: 1px;
   top: 46px;
@@ -2246,7 +2247,6 @@ textarea {
   border: 1.3px solid #667dff;
   background: linear-gradient(90deg, rgba(97, 121, 255, 0.9), rgba(255, 111, 211, 0.9));
   color: #fff;
-  display: grid;
   place-items: center;
   font-size: 13px;
   font-weight: 700;
