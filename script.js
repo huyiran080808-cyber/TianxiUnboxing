@@ -4109,6 +4109,7 @@ let clawLoadingTimer = null;
 let clawLoadingFrame = null;
 let clawExpertsAdded = false;
 let clawIntroAnimationStarted = false;
+let clawIntroAnimationToken = 0;
 let clawAddedSequence = 1;
 
 const CLAW_AVATAR_DIR = './custom-assets/claw-flow/agent-avatars/';
@@ -5195,7 +5196,7 @@ function setClawFlowPage(page) {
     setClawConfigSection(clawConfigSection);
     renderClawExpertCards();
     document.querySelector('.claw-dialog-scroll')?.scrollTo({ top: 0 });
-    if (clawConfigSection === 'config') requestAnimationFrame(startClawIntroAnimation);
+    if (clawConfigSection === 'config') requestAnimationFrame(() => startClawIntroAnimation({ force: true }));
   }
 }
 
@@ -5285,8 +5286,7 @@ function startClawLoadingAnimation() {
   clawLoadingFrame = requestAnimationFrame(tick);
   clawLoadingTimer = setTimeout(() => {
     clawIntroAnimationStarted = false;
-    activeClawHomeAgent = CLAW_XIAOTIAN_HOME;
-    clawConfigSection = 'xiaotian';
+    clawConfigSection = 'config';
     navigateTo('claw-config');
   }, duration);
 }
@@ -5599,6 +5599,7 @@ function startClawIntroAnimation(options = {}) {
     return;
   }
   clawIntroAnimationStarted = true;
+  const animationToken = ++clawIntroAnimationToken;
 
   const paragraphs = [...article.querySelectorAll(':scope > p')];
   const leadParagraphs = paragraphs.slice(0, 5);
@@ -5634,6 +5635,7 @@ function startClawIntroAnimation(options = {}) {
   });
 
   sequence = sequence.then(async () => {
+    if (animationToken !== clawIntroAnimationToken) return;
     for (const card of cards) {
       card.classList.remove('is-intro-pending');
       const title = card.querySelector('strong');
@@ -5645,10 +5647,14 @@ function startClawIntroAnimation(options = {}) {
   });
 
   if (closingParagraph) {
-    sequence = sequence.then(() => typeClawText(closingParagraph, stored.get(closingParagraph), { speed: 4, step: 1, autoScroll: false }));
+    sequence = sequence.then(() => {
+      if (animationToken !== clawIntroAnimationToken) return;
+      return typeClawText(closingParagraph, stored.get(closingParagraph), { speed: 4, step: 1, autoScroll: false });
+    });
   }
 
   sequence.finally(() => {
+    if (animationToken !== clawIntroAnimationToken) return;
     selectionBar?.classList.remove('is-intro-pending');
     article.classList.remove('is-intro-pending-root');
   });
